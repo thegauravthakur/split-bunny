@@ -5,6 +5,7 @@ import { currentUser } from "@clerk/nextjs/server"
 import prisma from "@/lib/prisma"
 import { format } from "date-fns"
 import { CreateNewGroupCard } from "@/app/components/create-new-group-card"
+import Link from "next/link"
 
 export default async function Home() {
     const user = await currentUser()
@@ -17,7 +18,8 @@ export default async function Home() {
             <main className={cn("max-w-screen-lg mx-auto grid grid-cols-3 gap-4 mt-20")}>
                 <CreateNewGroupCard />
                 {groups.map((group) => (
-                    <section
+                    <Link
+                        href={`/group/${group.id}`}
                         key={group.id}
                         className="border rounded-md shadow p-4 flex flex-col justify-between gap-y-4"
                     >
@@ -25,7 +27,7 @@ export default async function Home() {
                         <p className="text-sm text-muted-foreground">
                             {format(group.created_at, "MMMM dd, yyyy")}
                         </p>
-                    </section>
+                    </Link>
                 ))}
             </main>
             <Button asChild>

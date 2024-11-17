@@ -1,9 +1,11 @@
 import type { Metadata } from "next"
-import { ClerkProvider } from "@clerk/nextjs"
+import { ClerkProvider, SignOutButton } from "@clerk/nextjs"
 
 import "./globals.css"
 import { LayoutProps } from "@/types/common"
 import { Toaster } from "@/components/ui/sonner"
+import Link from "next/link"
+import { LogoutButton } from "@/app/components/logout-button"
 
 export const metadata: Metadata = {
     title: "Split Bunny",
@@ -16,15 +18,16 @@ export default function RootLayout({ children }: LayoutProps) {
             <html lang="en">
                 <body className="">
                     <header className="flex items-center border-b px-4 py-3 text-sm">
-                        <h1>Split Bunny</h1>
+                        <h1>
+                            <Link href={"/"}>Split Bunny</Link>
+                        </h1>
                         <ul className="flex-1 flex gap-x-4 justify-center">
                             <li>Home</li>
                             <li>Groups</li>
                             <li>Settings</li>
                         </ul>
                         <div className="flex gap-x-4">
-                            <button>Sign in</button>
-                            <button>Sign up</button>
+                            <LogoutButton />
                         </div>
                     </header>
                     {children}
