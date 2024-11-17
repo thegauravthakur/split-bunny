@@ -1,0 +1,61 @@
+"use server"
+
+import prisma from "@/lib/prisma"
+import type { Group } from "@prisma/client"
+import { auth } from "@clerk/nextjs/server"
+import { revalidatePath } from "next/cache"
+import { err, ok, Result } from "neverthrow"
+import { redirect } from "next/navigation"
+import { z } from "zod"
+import { createServerStreameableResponse } from "@/app/utils/result"
+
+async function createGroup(name: string, _userId?: string): Promise<Result<Group, string[]>> {
+    let userId = _userId
+
+    try {
+        if (!userId) {
+            const _auth = await auth()
+            userId = _auth.userId ?? undefined
+        }
+
+        if (!userId) {
+            return err(["You must be logged in to create a group."])
+        }
+
+        const group = await prisma.group.create({
+            data: { name, member_ids: [userId], main_image: "", cover_image: "" },
+        })
+
+        return ok(group)
+    } catch (_error) {
+        return err(["An error occurred while creating the group. Please try again."])
+    }
+}
+
+const createGroupSchema = z.object({
+    name: z
+        .string()
+        .min(3, "Group name must be at least 3 characters.")
+        .max(50, "Group name must be at most 50 characters."),
+})
+
+export async function createGroupAction(formData: FormData) {
+    const name = formData.get("name") as string
+    const parseResult = createGroupSchema.safeParse({ name })
+    if (!parseResult.success) {
+        const data = parseResult.error.errors.map((error) => error.message)
+        return createServerStreameableResponse(ok(data))
+    }
+
+    try {
+        const response = await createGroup(name)
+        if (response.isOk()) {
+            revalidatePath("/")
+            redirect("/")
+        } else {
+            return createServerStreameableResponse(err(response.error))
+        }
+    } catch (_error) {
+        return createServerStreameableResponse(err(["An error occurred. Please try again."]))
+    }
+}

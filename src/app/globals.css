@@ -56,4 +56,21 @@
         --chart-4: 280 65% 60%;
         --chart-5: 340 75% 55%;
     }
+
+}
+
+div.cl-rootBox {
+    @apply w-full max-w-md;
+}
+
+div.cl-cardBox {
+    @apply w-auto max-w-none;
+}
+
+.cl-card {
+    @apply max-w-none p-6 md:p-8;
+}
+
+div:has(>a[aria-label="Clerk logo"]) {
+    @apply !hidden;
 }
