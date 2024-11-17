@@ -14,7 +14,7 @@ export default async function Home() {
 
     return (
         <div>
-            <main className={cn("max-w-screen-lg mx-auto grid grid-cols-3 gap-4")}>
+            <main className={cn("max-w-screen-lg mx-auto grid grid-cols-3 gap-4 mt-20")}>
                 <CreateNewGroupCard />
                 {groups.map((group) => (
                     <section

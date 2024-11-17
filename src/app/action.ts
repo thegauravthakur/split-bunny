@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache"
 import { err, ok, Result } from "neverthrow"
 import { redirect } from "next/navigation"
 import { z } from "zod"
-import { createServerStreameableResponse } from "@/app/utils/result"
+import { createParsableResultInterface } from "@/app/utils/result"
 
 async function createGroup(name: string, _userId?: string): Promise<Result<Group, string[]>> {
     let userId = _userId
@@ -40,22 +40,28 @@ const createGroupSchema = z.object({
 })
 
 export async function createGroupAction(formData: FormData) {
+    let groupId: string | undefined
     const name = formData.get("name") as string
     const parseResult = createGroupSchema.safeParse({ name })
+
     if (!parseResult.success) {
         const data = parseResult.error.errors.map((error) => error.message)
-        return createServerStreameableResponse(ok(data))
+        return createParsableResultInterface(ok(data))
     }
 
     try {
         const response = await createGroup(name)
-        if (response.isOk()) {
-            revalidatePath("/")
-            redirect("/")
+        if (response.isErr()) {
+            return createParsableResultInterface(err(response.error))
         } else {
-            return createServerStreameableResponse(err(response.error))
+            groupId = response.value.id
         }
     } catch (_error) {
-        return createServerStreameableResponse(err(["An error occurred. Please try again."]))
+        return createParsableResultInterface(err(["An error occurred. Please try again."]))
+    }
+
+    if (groupId) {
+        revalidatePath("/")
+        redirect(`/groups/${groupId}`)
     }
 }

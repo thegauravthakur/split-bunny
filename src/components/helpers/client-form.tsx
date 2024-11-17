@@ -5,27 +5,38 @@ import { toast } from "sonner"
 import { PiSpinner } from "react-icons/pi"
 import { cn } from "@/lib/utils"
 import { Button, ButtonProps } from "@/components/ui/button"
-import { Result, safeTry } from "neverthrow"
-import { parseServerStringToResultInterface } from "@/app/utils/result"
+import { Result } from "neverthrow"
+import { parseResultInterfaceFromObject } from "@/app/utils/result"
 
 interface ClientFormProps extends Omit<HTMLProps<HTMLFormElement>, "action"> {
-    action: (formData: FormData) => Promise<string>
+    action: (formData: FormData) => any
     onSubmitSuccess?: () => void
 }
 
-function handleGenericResponse(response: Result<string[], string[]>) {
+function handleGenericResponse<T, K>(response: Result<T, K>) {
+    const handleMessage = (message: unknown, isSuccess: boolean) => {
+        if (isSuccess && typeof message === "string") toast.success(message)
+        else if (message === "string") toast.error(message)
+    }
+
+    const handleResponse = (messages: unknown, isSuccess: boolean) => {
+        if (!Array.isArray(messages)) return
+        if (isSuccess) messages.forEach((message) => handleMessage(message, true))
+        else messages.forEach((message) => handleMessage(message, false))
+    }
+
     response
-        .map((messages) => messages.forEach((message) => toast.success(message)))
-        .mapErr((messages) => messages.forEach((message) => toast.error(message)))
+        .map((messages) => handleResponse(messages, true))
+        .mapErr((messages) => handleResponse(messages, false))
 }
 
-export function ClientForm({ onSubmitSuccess, ...props }: ClientFormProps) {
+export function ClientForm<T, K>({ onSubmitSuccess, ...props }: ClientFormProps) {
     return (
         <form
             {...props}
             action={async (formData) => {
-                const responseString = await props.action(formData)
-                const response = parseServerStringToResultInterface(responseString)
+                const _response = await props.action(formData)
+                const response = parseResultInterfaceFromObject<T, K>(_response)
                 handleGenericResponse(response)
                 if (response.isOk()) {
                     if (onSubmitSuccess) onSubmitSuccess()
@@ -55,7 +66,7 @@ export function ClientFormButton({
             disabled={disabled || isLoading}
             type="submit"
         >
-            {isLoading && <PiSpinner fontSize={18} />}
+            {!isLoading && <PiSpinner className="animate-spin" fontSize={18} />}
             <span>{children}</span>
         </Button>
     )

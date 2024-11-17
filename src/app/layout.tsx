@@ -15,6 +15,18 @@ export default function RootLayout({ children }: LayoutProps) {
         <ClerkProvider>
             <html lang="en">
                 <body className="">
+                    <header className="flex items-center border-b px-4 py-3 text-sm">
+                        <h1>Split Bunny</h1>
+                        <ul className="flex-1 flex gap-x-4 justify-center">
+                            <li>Home</li>
+                            <li>Groups</li>
+                            <li>Settings</li>
+                        </ul>
+                        <div className="flex gap-x-4">
+                            <button>Sign in</button>
+                            <button>Sign up</button>
+                        </div>
+                    </header>
                     {children}
                     <Toaster />
                 </body>
