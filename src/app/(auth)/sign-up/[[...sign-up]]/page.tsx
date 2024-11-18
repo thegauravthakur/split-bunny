@@ -1,9 +1,30 @@
-import { SignUp } from "@clerk/nextjs"
+"use client"
+
+import { SignUp, useSignIn } from "@clerk/nextjs"
+import { useEffect, useState } from "react"
+import { FullScreenSpinner } from "@/components/ui/full-screen-spinner"
+import { cn } from "@/lib/utils"
 
 export default function LoginPage() {
+    const [showSignUp, setShowSignUp] = useState(false)
+    const { isLoaded } = useSignIn()
+
+    useEffect(() => {
+        let timeout: number | undefined
+        if (isLoaded) {
+            const timeout = setTimeout(() => setShowSignUp(true), 200)
+        }
+        return () => {
+            clearTimeout(timeout)
+        }
+    }, [isLoaded])
+
     return (
-        <main className="min-h-dvh flex items-center justify-center">
-            <SignUp />
+        <main className="flex items-center justify-center flex-1">
+            {!showSignUp && <FullScreenSpinner />}
+            <span className={cn("w-full flex justify-center", !showSignUp && "invisible")}>
+                <SignUp />
+            </span>
         </main>
     )
 }

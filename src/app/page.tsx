@@ -30,9 +30,6 @@ export default async function Home() {
                     </Link>
                 ))}
             </main>
-            <Button asChild>
-                <SignOutButton>Logout Button</SignOutButton>
-            </Button>
         </div>
     )
 }
