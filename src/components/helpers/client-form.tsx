@@ -11,12 +11,13 @@ import { parseResultInterfaceFromObject } from "@/app/utils/result"
 interface ClientFormProps extends Omit<HTMLProps<HTMLFormElement>, "action"> {
     action: (formData: FormData) => any
     onSubmitSuccess?: () => void
+    closeOnSuccess?: boolean
 }
 
 function handleGenericResponse<T, K>(response: Result<T, K>) {
     const handleMessage = (message: unknown, isSuccess: boolean) => {
         if (isSuccess && typeof message === "string") toast.success(message)
-        else if (message === "string") toast.error(message)
+        else if (typeof message === "string") toast.error(message)
     }
 
     const handleResponse = (messages: unknown, isSuccess: boolean) => {
@@ -24,6 +25,7 @@ function handleGenericResponse<T, K>(response: Result<T, K>) {
         if (isSuccess) messages.forEach((message) => handleMessage(message, true))
         else messages.forEach((message) => handleMessage(message, false))
     }
+    console.log(response)
 
     response
         .map((messages) => handleResponse(messages, true))
@@ -37,6 +39,7 @@ export function ClientForm<T, K>({ onSubmitSuccess, ...props }: ClientFormProps)
             action={async (formData) => {
                 const _response = await props.action(formData)
                 const response = parseResultInterfaceFromObject<T, K>(_response)
+                console.log(response)
                 handleGenericResponse(response)
                 if (response.isOk()) {
                     if (onSubmitSuccess) onSubmitSuccess()
@@ -66,7 +69,7 @@ export function ClientFormButton({
             disabled={disabled || isLoading}
             type="submit"
         >
-            {!isLoading && <PiSpinner className="animate-spin" fontSize={18} />}
+            {isLoading && <PiSpinner className="animate-spin" fontSize={18} />}
             <span>{children}</span>
         </Button>
     )

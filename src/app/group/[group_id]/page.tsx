@@ -11,9 +11,25 @@ import React from "react"
 import { cn } from "@/lib/utils"
 import { auth } from "@clerk/nextjs/server"
 import { CiReceipt } from "react-icons/ci"
+import { IoIosAdd } from "react-icons/io"
+import { NewExpenseButton } from "@/app/group/[group_id]/components/new-expense-button"
+import { Expense } from "@prisma/client"
+import { format } from "date-fns"
 
 interface PageProps {
     params: Promise<{ group_id: string }>
+}
+
+function getExpensesByMonth(expenses: Expense[]) {
+    return expenses.reduce(
+        (acc, expense) => {
+            const month = format(expense.created_at, "MMMM")
+            if (!acc[month]) acc[month] = []
+            acc[month].push(expense)
+            return acc
+        },
+        {} as Record<string, Expense[]>,
+    )
 }
 
 export default async function Page({ params }: PageProps) {
@@ -24,6 +40,13 @@ export default async function Page({ params }: PageProps) {
     })
 
     if (!group) notFound()
+
+    const expenses = await prisma.expense.findMany({
+        where: { group_id: group_id },
+        orderBy: { created_at: "desc" },
+    })
+
+    const expensesByMonth = getExpensesByMonth(expenses)
 
     return (
         <main className="max-w-screen-xl mx-auto w-full">
@@ -56,6 +79,9 @@ export default async function Page({ params }: PageProps) {
                                 <MdDelete />
                             </Button>
                         </li>
+                        <li>
+                            <NewExpenseButton groupId={group_id} />
+                        </li>
                     </ul>
                 </div>
                 <ul className={cn("gap-5 mt-6 flex overflow-x-auto -mx-6 no-scrollbar")}>
@@ -78,40 +104,18 @@ export default async function Page({ params }: PageProps) {
                     </li>
                 </ul>
             </header>
-            <div className="mt-6 text-sm px-4">
-                <h4 className="font-semibold">February 2022</h4>
-                <ul className="grid grid-cols-2 gap-4 mt-4">
-                    <li>
-                        <ExpenseCard />
-                    </li>
-                    <li>
-                        <ExpenseCard />
-                    </li>
-                    <li>
-                        <ExpenseCard />
-                    </li>
-                    <li>
-                        <ExpenseCard />
-                    </li>
-                </ul>
-            </div>
-            <div className="mt-6 text-sm px-4">
-                <h4 className="font-semibold">January 2024</h4>
-                <ul className="grid grid-cols-2 gap-4 mt-4">
-                    <li>
-                        <ExpenseCard />
-                    </li>
-                    <li>
-                        <ExpenseCard />
-                    </li>
-                    <li>
-                        <ExpenseCard />
-                    </li>
-                    <li>
-                        <ExpenseCard />
-                    </li>
-                </ul>
-            </div>
+            {Object.keys(expensesByMonth).map((month) => (
+                <div className="mt-6 text-sm px-4" key={month}>
+                    <h4 className="font-semibold">{month}</h4>
+                    <ul className="grid grid-cols-2 gap-4 mt-4">
+                        {expensesByMonth[month].map((expense) => (
+                            <li key={expense.id}>
+                                <ExpenseCard expense={expense} />
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            ))}
         </main>
     )
 }
@@ -136,17 +140,21 @@ export function InfoCard({ title, subTitle, description }: InfoCardProps) {
     )
 }
 
-export function ExpenseCard() {
+interface ExpenseCardProps {
+    expense: Expense
+}
+
+export function ExpenseCard({ expense }: ExpenseCardProps) {
     return (
         <div className={cn("rounded-xl border p-4 shadow-sm flex items-center gap-x-2")}>
             <div className="flex flex-col text-muted-foreground">
-                <span>Jan</span>
-                <span>06</span>
+                <span>{format(expense.created_at, "MMM")}</span>
+                <span>{format(expense.created_at, "dd")}</span>
             </div>
             <CiReceipt fontSize={42} />
             <div>
-                <h5 className="font-semibold">Meghana Biryani</h5>
-                <p className="text-sm text-muted-foreground">You paid $120</p>
+                <h5 className="font-semibold">{expense.name}</h5>
+                <p className="text-sm text-muted-foreground">You paid ${expense.amount}</p>
             </div>
         </div>
     )
