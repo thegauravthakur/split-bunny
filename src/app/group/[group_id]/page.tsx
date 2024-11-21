@@ -46,6 +46,9 @@ export default async function Page({ params }: PageProps) {
         orderBy: { created_at: "desc" },
     })
 
+    const totalExpenses = expenses.reduce((acc, expense) => acc + expense.amount, 0)
+    const totalMembers = group.member_ids.length
+
     const expensesByMonth = getExpensesByMonth(expenses)
 
     return (
@@ -94,16 +97,31 @@ export default async function Page({ params }: PageProps) {
                     </li>
                     <li className="flex-1 min-w-60">
                         <InfoCard
-                            subTitle="$5600"
+                            subTitle={`$${totalExpenses}`}
                             title={"Total Transactions"}
                             description="have been done"
                         />
                     </li>
                     <li className="flex-1 min-w-60">
-                        <InfoCard subTitle="2" title={"Total Members"} description="have joined" />
+                        <InfoCard
+                            subTitle={String(totalMembers)}
+                            title={`Total ${totalMembers > 1 ? "Members" : "Member"}`}
+                            description="have joined"
+                        />
                     </li>
                 </ul>
             </header>
+            {expenses.length === 0 ? (
+                <div className="flex flex-col items-center justify-center gap-2 mt-6">
+                    <h4 className="font-semibold">No Expenses</h4>
+                    <p className="text-muted-foreground text-sm">
+                        You haven't added any expenses yet. Start by adding some.
+                    </p>
+                    <span className="mt-6">
+                        <NewExpenseButton groupId={group_id} />
+                    </span>
+                </div>
+            ) : null}
             {Object.keys(expensesByMonth).map((month) => (
                 <div className="mt-6 text-sm px-4" key={month}>
                     <h4 className="font-semibold">{month}</h4>
