@@ -14,9 +14,16 @@ function getGroupDetails(groupId: string, userId: string): Promise<Group | null>
     })
 }
 
+/**
+ * This function creates a new expense or updates an existing expense.
+ * @param expense The expense object to create or update.
+ * @param groupId The ID of the group to which the expense belongs.
+ * @param expenseId The ID of the expense to update. If not provided, a new expense will be created.
+ */
 async function createExpense(
     expense: CreateExpenseSchemaType,
     groupId: string,
+    expenseId?: string,
 ): Promise<Result<Expense, string[]>> {
     try {
         const _auth = await auth()
@@ -27,6 +34,26 @@ async function createExpense(
         if (!parseResult.success) {
             const data = parseResult.error.errors.map((error) => error.message)
             return err(data)
+        }
+
+        // If expenseId is present, it means we are updating an existing expense
+        if (expenseId) {
+            const existingExpense = await prisma.expense.findUnique({
+                where: { id: expenseId, group_id: groupId },
+            })
+            if (!existingExpense) return err(["Expense not found."])
+
+            const newExpense = await prisma.expense.update({
+                where: { id: expenseId, group_id: groupId },
+                data: {
+                    name: expense.name,
+                    amount: expense.amount,
+                    description: expense.description,
+                    created_by: userId,
+                    group_id: groupId,
+                },
+            })
+            return ok(newExpense)
         }
 
         const group = await getGroupDetails(groupId, userId)
@@ -58,6 +85,7 @@ const createExpenseSchema = z.object({
         .min(1, "Expense amount must be at least 1 dollar."),
     description: z.string().min(1, "Expense description must be at least 1 character."),
     group_id: z.string({ message: "Group ID must be a string." }),
+    id: z.string().optional(),
 })
 
 type CreateExpenseSchemaType = z.infer<typeof createExpenseSchema>
@@ -70,8 +98,7 @@ export async function createExpenseAction(formData: FormData) {
         ..._expenseBody,
         amount: Number(_expenseBody.amount),
     }
-    const expense = await createExpense(expenseBody, expenseBody.group_id)
-    console.log(expense)
+    const expense = await createExpense(expenseBody, expenseBody.group_id, expenseBody.id)
     if (expense.isErr()) {
         return createParsableResultInterface(err(expense.error))
     }

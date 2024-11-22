@@ -11,6 +11,7 @@ export default async function Home() {
     const user = await currentUser()
     const groups = await prisma.group.findMany({
         where: { member_ids: { has: user?.id } },
+        orderBy: { created_at: "desc" },
     })
 
     return (

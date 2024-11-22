@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import { Button, ButtonProps } from "@/components/ui/button"
 import { Result } from "neverthrow"
 import { parseResultInterfaceFromObject } from "@/app/utils/result"
+import Form from "next/form"
 
 interface ClientFormProps extends Omit<HTMLProps<HTMLFormElement>, "action"> {
     action: (formData: FormData) => any
@@ -34,7 +35,7 @@ function handleGenericResponse<T, K>(response: Result<T, K>) {
 
 export function ClientForm<T, K>({ onSubmitSuccess, ...props }: ClientFormProps) {
     return (
-        <form
+        <Form
             {...props}
             action={async (formData) => {
                 const _response = await props.action(formData)

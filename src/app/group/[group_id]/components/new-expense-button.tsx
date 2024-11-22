@@ -1,7 +1,5 @@
 "use client"
-import { Button } from "@/components/ui/button"
-import { IoIosAdd } from "react-icons/io"
-import React, { useState } from "react"
+import React, { ReactNode, useState } from "react"
 import {
     Dialog,
     DialogContent,
@@ -15,22 +13,21 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { createExpenseAction } from "@/app/group/[group_id]/action"
+import { Expense } from "@prisma/client"
 
 interface NewExpenseButtonProps {
     groupId: string
+    expense?: Expense
+    children: ReactNode
 }
 
-export function NewExpenseButton({ groupId }: NewExpenseButtonProps) {
+export function NewExpenseButton({ groupId, expense, children }: NewExpenseButtonProps) {
     const [isOpen, setIsOpen] = useState(false)
+    const isUpdateOperation = Boolean(expense)
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-                <Button variant="secondary" className="[&_svg]:size-6">
-                    <IoIosAdd />
-                    <span>New Expense</span>
-                </Button>
-            </DialogTrigger>
+            <DialogTrigger asChild>{children}</DialogTrigger>
             <DialogContent className="">
                 <DialogHeader>
                     <DialogTitle>Create a new expense</DialogTitle>
@@ -50,6 +47,7 @@ export function NewExpenseButton({ groupId }: NewExpenseButtonProps) {
                         id="expense-name"
                         placeholder="Coffee"
                         name="name"
+                        defaultValue={expense?.name}
                     />
                     <Label htmlFor="expense-amount">Amount</Label>
                     <Input
@@ -58,6 +56,7 @@ export function NewExpenseButton({ groupId }: NewExpenseButtonProps) {
                         id="expense-amount"
                         placeholder="100"
                         name="amount"
+                        defaultValue={expense?.amount}
                     />
                     <Label htmlFor="expense-description">Description</Label>
                     <Textarea
@@ -66,8 +65,12 @@ export function NewExpenseButton({ groupId }: NewExpenseButtonProps) {
                         id="expense-description"
                         placeholder="Coffee"
                         name="description"
+                        defaultValue={expense?.description}
                     />
                     <Input type="hidden" name="group_id" value={groupId} />
+                    {isUpdateOperation ? (
+                        <Input type="hidden" name="id" value={expense?.id} />
+                    ) : null}
                     <ClientFormButton className="mt-6">Create Expense</ClientFormButton>
                 </ClientForm>
             </DialogContent>

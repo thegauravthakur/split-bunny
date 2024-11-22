@@ -62,6 +62,6 @@ export async function createGroupAction(formData: FormData) {
 
     if (groupId) {
         revalidatePath("/")
-        redirect(`/groups/${groupId}`)
+        redirect(`/group/${groupId}`)
     }
 }

@@ -1,20 +1,20 @@
 import prisma from "@/lib/prisma"
-import { notFound, redirect } from "next/navigation"
+import { notFound } from "next/navigation"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { CiSettings } from "react-icons/ci"
 import { Button } from "@/components/ui/button"
 import { MdDelete } from "react-icons/md"
-import { IoIosArrowRoundBack } from "react-icons/io"
+import { IoIosAdd, IoIosArrowRoundBack } from "react-icons/io"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import React from "react"
 import { cn } from "@/lib/utils"
 import { auth } from "@clerk/nextjs/server"
 import { CiReceipt } from "react-icons/ci"
-import { IoIosAdd } from "react-icons/io"
 import { NewExpenseButton } from "@/app/group/[group_id]/components/new-expense-button"
 import { Expense } from "@prisma/client"
 import { format } from "date-fns"
+import { CiEdit } from "react-icons/ci"
 
 interface PageProps {
     params: Promise<{ group_id: string }>
@@ -83,7 +83,12 @@ export default async function Page({ params }: PageProps) {
                             </Button>
                         </li>
                         <li>
-                            <NewExpenseButton groupId={group_id} />
+                            <NewExpenseButton groupId={group_id}>
+                                <Button variant="secondary" className="[&_svg]:size-6">
+                                    <IoIosAdd />
+                                    <span>New Expense</span>
+                                </Button>
+                            </NewExpenseButton>
                         </li>
                     </ul>
                 </div>
@@ -118,7 +123,12 @@ export default async function Page({ params }: PageProps) {
                         You haven't added any expenses yet. Start by adding some.
                     </p>
                     <span className="mt-6">
-                        <NewExpenseButton groupId={group_id} />
+                        <NewExpenseButton groupId={group_id}>
+                            <Button variant="secondary" className="[&_svg]:size-6">
+                                <IoIosAdd />
+                                <span>New Expense</span>
+                            </Button>
+                        </NewExpenseButton>
                     </span>
                 </div>
             ) : null}
@@ -170,10 +180,15 @@ export function ExpenseCard({ expense }: ExpenseCardProps) {
                 <span>{format(expense.created_at, "dd")}</span>
             </div>
             <CiReceipt fontSize={42} />
-            <div>
+            <div className="flex-1">
                 <h5 className="font-semibold">{expense.name}</h5>
                 <p className="text-sm text-muted-foreground">You paid ${expense.amount}</p>
             </div>
+            <NewExpenseButton groupId={expense.group_id} expense={expense}>
+                <Button variant="ghost" className="size-10 [&_svg]:size-6">
+                    <CiEdit />
+                </Button>
+            </NewExpenseButton>
         </div>
     )
 }
