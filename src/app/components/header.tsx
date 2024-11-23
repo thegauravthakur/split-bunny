@@ -1,4 +1,5 @@
 import Link from "next/link"
+
 import { LogoutButton } from "@/app/components/logout-button"
 
 export function Header() {

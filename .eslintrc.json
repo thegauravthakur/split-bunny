@@ -1,7 +1,20 @@
 {
   "extends": ["next/core-web-vitals", "next/typescript"],
+  "plugins": ["simple-import-sort"],
   "rules": {
     "@next/next/no-img-element": "off",
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    "react/jsx-sort-props": [
+      "error",
+      {
+        "callbacksLast": true,
+        "shorthandFirst": true,
+        "shorthandLast": false,
+        "noSortAlphabetically": false,
+        "reservedFirst": true
+      }
+    ],
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
@@ -14,5 +27,9 @@
         "ignoreRestSiblings": true
       }
     ]
+  },
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": "latest"
   }
 }

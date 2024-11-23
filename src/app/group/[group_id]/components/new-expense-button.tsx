@@ -1,6 +1,17 @@
 "use client"
 
 import React, { ReactNode, useState } from "react"
+import { LiaRupeeSignSolid } from "react-icons/lia"
+
+import { createExpenseAction } from "@/app/group/[group_id]/action"
+import {
+    createSplitConfig,
+    People,
+    SplitEquallySection,
+} from "@/app/group/[group_id]/components/split-equally-section"
+import { ExpenseWithSplits } from "@/app/group/[group_id]/page"
+import { ClientForm, ClientFormButton } from "@/components/helpers/client-form"
+import { Button } from "@/components/ui/button"
 import {
     Dialog,
     DialogContent,
@@ -9,14 +20,9 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { ClientForm, ClientFormButton } from "@/components/helpers/client-form"
-import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { createExpenseAction } from "@/app/group/[group_id]/action"
-import { Expense } from "@prisma/client"
-import { Button } from "@/components/ui/button"
-import { LiaRupeeSignSolid } from "react-icons/lia"
+import { Label } from "@/components/ui/label"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import {
     Select,
     SelectContent,
@@ -24,14 +30,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-    createSplitConfig,
-    People,
-    SplitEquallySection,
-} from "@/app/group/[group_id]/components/split-equally-section"
-import { ExpenseWithSplits } from "@/app/group/[group_id]/page"
+import { Textarea } from "@/components/ui/textarea"
 
 export interface Member {
     name: string
@@ -60,7 +60,7 @@ export function NewExpenseButton({
         if (!expense) return members.map((member) => ({ ...member, isChecked: true }))
         return members.map((member) => ({
             ...member,
-            isChecked: expense.splits.some((s) => s.payee === member.id),
+            isChecked: expense.splits.some((s) => s.user_id === member.id),
         }))
     })
     const splitConfig = createSplitConfig(people, amount)
@@ -90,16 +90,16 @@ export function NewExpenseButton({
                     <Label htmlFor="expense-name">Expense name</Label>
                     <Input
                         required
-                        type="text"
-                        id="expense-name"
-                        placeholder="Coffee"
-                        name="name"
                         defaultValue={expense?.name}
+                        id="expense-name"
+                        name="name"
+                        placeholder="Coffee"
+                        type="text"
                     />
                     <div className="flex items-center gap-x-2">
                         <Label htmlFor="expense-amount">Amount </Label>
                         <div className="flex items-center gap-x-2 text-sm flex-1">
-                            <Select defaultValue={userId ?? members[0]?.id} name="payee">
+                            <Select defaultValue={userId ?? members[0]?.id} name="paid_by">
                                 <SelectTrigger className="[&_svg]:hidden bg-secondary text-xs px-3 h-8 w-max font-medium shadow-none border-transparent">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -121,15 +121,15 @@ export function NewExpenseButton({
                                 <PopoverContent>
                                     <Label>Amount</Label>
                                     <Input
-                                        startIcon={LiaRupeeSignSolid}
-                                        className="mt-2"
                                         required
-                                        type="number"
+                                        className="mt-2"
                                         placeholder="Enter amount"
+                                        startIcon={LiaRupeeSignSolid}
+                                        type="number"
                                         value={amount}
                                         onChange={(e) => setAmount(Number(e.target.value))}
                                     />
-                                    <Tabs defaultValue="account" className="mt-4 w-full">
+                                    <Tabs className="mt-4 w-full" defaultValue="account">
                                         <TabsList className="w-full">
                                             <TabsTrigger className="flex-1" value="account">
                                                 Equal
@@ -141,14 +141,14 @@ export function NewExpenseButton({
                                                 Amount
                                             </TabsTrigger>
                                         </TabsList>
-                                        <TabsContent value="account" className="mt-4">
+                                        <TabsContent className="mt-4" value="account">
                                             <SplitEquallySection
-                                                setPeople={setPeople}
-                                                people={people}
                                                 amount={amount}
+                                                people={people}
+                                                setPeople={setPeople}
                                             />
                                         </TabsContent>
-                                        <TabsContent value="percentage" className="">
+                                        <TabsContent className="" value="percentage">
                                             coming soon
                                         </TabsContent>
                                         <TabsContent value="amount">coming soon</TabsContent>
@@ -158,29 +158,31 @@ export function NewExpenseButton({
                         </div>
                     </div>
                     <Input
-                        startIcon={LiaRupeeSignSolid}
                         required
-                        type="number"
                         id="expense-amount"
-                        placeholder="100"
-                        name="amount"
-                        value={amount}
                         min={1}
+                        name="amount"
+                        placeholder="100"
+                        startIcon={LiaRupeeSignSolid}
+                        type="number"
+                        value={amount}
                         onChange={(e) => setAmount(Number(e.target.value))}
                     />
                     <Label htmlFor="expense-description">Description</Label>
                     <Textarea
-                        rows={4}
                         required
-                        id="expense-description"
-                        placeholder="Coffee"
-                        name="description"
                         defaultValue={expense?.description}
+                        id="expense-description"
+                        name="description"
+                        placeholder="Coffee"
+                        rows={4}
                     />
-                    <input type="hidden" name="group_id" value={groupId} />
-                    <input type="hidden" name="split_config" value={JSON.stringify(splitConfig)} />
+                    <input name="group_id" type="hidden" value={groupId} />
+                    <input name="split_config" type="hidden" value={JSON.stringify(splitConfig)} />
                     {isUpdateOperation ? (
-                        <input type="hidden" name="id" value={expense?.id} />
+                        <>
+                            <input name="id" type="hidden" value={expense?.id} />
+                        </>
                     ) : null}
                     <ClientFormButton className="mt-6">Create Expense</ClientFormButton>
                 </ClientForm>

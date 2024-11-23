@@ -1,12 +1,12 @@
-import { Prisma } from "@prisma/client"
-import { Member, NewExpenseButton } from "@/app/group/[group_id]/components/new-expense-button"
 import { auth } from "@clerk/nextjs/server"
-import { cn } from "@/lib/utils"
 import { format } from "date-fns"
-import { CiEdit, CiReceipt } from "react-icons/ci"
-import { Button } from "@/components/ui/button"
 import React from "react"
+import { CiEdit, CiReceipt } from "react-icons/ci"
+
+import { Member, NewExpenseButton } from "@/app/group/[group_id]/components/new-expense-button"
 import { ExpenseWithSplits } from "@/app/group/[group_id]/page"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 interface ExpenseCardProps {
     expense: ExpenseWithSplits
@@ -32,12 +32,12 @@ export async function ExpenseCard({ expense, members }: ExpenseCardProps) {
                 </p>
             </div>
             <NewExpenseButton
-                members={members}
-                groupId={expense.group_id}
                 expense={expense}
+                groupId={expense.group_id}
+                members={members}
                 userId={userId as string}
             >
-                <Button variant="ghost" className="size-10 [&_svg]:size-6">
+                <Button className="size-10 [&_svg]:size-6" variant="ghost">
                     <CiEdit />
                 </Button>
             </NewExpenseButton>

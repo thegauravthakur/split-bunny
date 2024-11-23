@@ -1,12 +1,13 @@
 "use server"
 
-import { z } from "zod"
-import { createParsableResultInterface } from "@/app/utils/result"
-import { err, ok, Result } from "neverthrow"
-import type { Expense, Group } from "@prisma/client"
 import { auth } from "@clerk/nextjs/server"
-import prisma from "@/lib/prisma"
+import type { Expense, Group } from "@prisma/client"
+import { err, ok, Result } from "neverthrow"
 import { revalidatePath } from "next/cache"
+import { z } from "zod"
+
+import { createParsableResultInterface } from "@/app/utils/result"
+import prisma from "@/lib/prisma"
 
 function getGroupDetails(groupId: string, userId: string): Promise<Group | null> {
     return prisma.group.findUnique({
@@ -83,13 +84,13 @@ async function createExpense(expense: CreateExpenseSchemaType): Promise<Result<E
                     description: expense.description,
                     created_by: userId,
                     group_id: expense.group_id,
+                    paid_by: expense.paid_by,
                     splits: {
-                        deleteMany: { payee: expense.id },
-                        create: splitConfig.map((s) => ({ payee: s.user_id, amount: s.amount })),
+                        deleteMany: { expense_id: expense.id },
+                        create: splitConfig.map((s) => ({ user_id: s.user_id, amount: s.amount })),
                     },
                 },
             })
-            console.log(newExpense, splitConfig)
             return ok(newExpense)
         }
 
@@ -104,9 +105,9 @@ async function createExpense(expense: CreateExpenseSchemaType): Promise<Result<E
                 created_by: userId,
                 group_id: expense.group_id,
                 type: "EQUAL",
-                payee: expense.name,
+                paid_by: expense.paid_by,
                 splits: {
-                    create: splitConfig.map((s) => ({ payee: s.user_id, amount: s.amount })),
+                    create: splitConfig.map((s) => ({ user_id: s.user_id, amount: s.amount })),
                 },
             },
         })
@@ -127,6 +128,7 @@ const createExpenseSchema = z.object({
         .min(1, "Expense amount must be at least 1 Rupees."),
     description: z.string().min(1, "Expense description must be at least 1 character."),
     group_id: z.string({ message: "Group ID must be a string." }),
+    paid_by: z.string(),
     split_config: z.string(),
     id: z.string().optional(),
 })
@@ -141,7 +143,6 @@ export async function createExpenseAction(formData: FormData) {
         ..._expenseBody,
         amount: Number(_expenseBody.amount),
     }
-    console.log(expenseBody)
     const expense = await createExpense(expenseBody)
     if (expense.isErr()) {
         return createParsableResultInterface(err(expense.error))

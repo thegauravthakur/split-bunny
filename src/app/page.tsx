@@ -1,11 +1,10 @@
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { SignOutButton } from "@clerk/nextjs"
 import { currentUser } from "@clerk/nextjs/server"
-import prisma from "@/lib/prisma"
 import { format } from "date-fns"
-import { CreateNewGroupCard } from "@/app/components/create-new-group-card"
 import Link from "next/link"
+
+import { CreateNewGroupCard } from "@/app/components/create-new-group-card"
+import prisma from "@/lib/prisma"
+import { cn } from "@/lib/utils"
 
 export default async function Home() {
     const user = await currentUser()
@@ -20,9 +19,9 @@ export default async function Home() {
                 <CreateNewGroupCard />
                 {groups.map((group) => (
                     <Link
-                        href={`/group/${group.id}`}
                         key={group.id}
                         className="border rounded-md shadow p-4 flex flex-col justify-between gap-y-4"
+                        href={`/group/${group.id}`}
                     >
                         <h3 className="capitalize">{group.name}</h3>
                         <p className="text-sm text-muted-foreground">

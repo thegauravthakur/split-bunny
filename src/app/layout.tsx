@@ -1,11 +1,11 @@
-import type { Metadata } from "next"
-import { ClerkProvider } from "@clerk/nextjs"
-
-import { LayoutProps } from "@/types/common"
-import { Toaster } from "@/components/ui/sonner"
-import { Header } from "@/app/components/header"
-
 import "./globals.css"
+
+import { ClerkProvider } from "@clerk/nextjs"
+import type { Metadata } from "next"
+
+import { Header } from "@/app/components/header"
+import { Toaster } from "@/components/ui/sonner"
+import { LayoutProps } from "@/types/common"
 
 export const metadata: Metadata = {
     title: "Split Bunny",

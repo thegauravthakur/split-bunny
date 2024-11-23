@@ -1,13 +1,14 @@
 "use server"
 
-import prisma from "@/lib/prisma"
-import type { Group } from "@prisma/client"
 import { auth } from "@clerk/nextjs/server"
-import { revalidatePath } from "next/cache"
+import type { Group } from "@prisma/client"
 import { err, ok, Result } from "neverthrow"
+import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { z } from "zod"
+
 import { createParsableResultInterface } from "@/app/utils/result"
+import prisma from "@/lib/prisma"
 
 async function createGroup(name: string, _userId?: string): Promise<Result<Group, string[]>> {
     let userId = _userId
@@ -23,7 +24,7 @@ async function createGroup(name: string, _userId?: string): Promise<Result<Group
         }
 
         const group = await prisma.group.create({
-            data: { name, member_ids: [userId], main_image: "" },
+            data: { name, member_ids: [userId], image: "" },
         })
 
         return ok(group)

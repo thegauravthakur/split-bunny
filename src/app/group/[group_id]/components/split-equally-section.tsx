@@ -1,4 +1,5 @@
 import React from "react"
+
 import { Checkbox } from "@/components/ui/checkbox"
 
 interface SplitEquallySectionProps {
@@ -33,11 +34,11 @@ export function SplitEquallySection({ amount, people, setPeople }: SplitEquallyS
                     <li key={person.name}>
                         <label className="text-sm grid grid-cols-[32px_1fr_max-content] items-center gap-4">
                             <img
-                                src={person.image}
                                 alt=""
-                                height={32}
-                                width={32}
                                 className="h-8 w-8 rounded-full"
+                                height={32}
+                                src={person.image}
+                                width={32}
                             />
                             <span className="select-none pointer-events-none">{person.name}</span>
                             <Checkbox

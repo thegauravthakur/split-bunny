@@ -1,3 +1,7 @@
+import { DialogBody } from "next/dist/client/components/react-dev-overlay/internal/components/Dialog"
+
+import { createGroupAction } from "@/app/action"
+import { ClientForm, ClientFormButton } from "@/components/helpers/client-form"
 import {
     Dialog,
     DialogContent,
@@ -6,11 +10,8 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { DialogBody } from "next/dist/client/components/react-dev-overlay/internal/components/Dialog"
-import { ClientForm, ClientFormButton } from "@/components/helpers/client-form"
-import { createGroupAction } from "@/app/action"
-import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 export function CreateNewGroupCard() {
     return (
@@ -35,10 +36,10 @@ export function CreateNewGroupCard() {
                         <Label htmlFor="group-name">Group name</Label>
                         <Input
                             required
-                            type="text"
                             id="group-name"
-                            placeholder="Flatmates"
                             name="name"
+                            placeholder="Flatmates"
+                            type="text"
                         />
                         <ClientFormButton className="mt-6">Create Group</ClientFormButton>
                     </ClientForm>

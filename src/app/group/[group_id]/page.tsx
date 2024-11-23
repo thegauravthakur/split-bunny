@@ -1,19 +1,20 @@
-import prisma from "@/lib/prisma"
-import { notFound } from "next/navigation"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { CiSettings } from "react-icons/ci"
-import { Button } from "@/components/ui/button"
-import { MdDelete } from "react-icons/md"
-import { IoIosAdd, IoIosArrowRoundBack } from "react-icons/io"
-import Link from "next/link"
-import React from "react"
-import { cn } from "@/lib/utils"
 import { auth, clerkClient, User } from "@clerk/nextjs/server"
-import { Member, NewExpenseButton } from "@/app/group/[group_id]/components/new-expense-button"
 import { Prisma } from "@prisma/client"
 import { format } from "date-fns"
+import Link from "next/link"
+import { notFound } from "next/navigation"
+import React from "react"
+import { CiSettings } from "react-icons/ci"
+import { IoIosAdd, IoIosArrowRoundBack } from "react-icons/io"
+import { MdDelete } from "react-icons/md"
+
 import { ExpenseCard } from "@/app/group/[group_id]/components/expense-cart"
 import { InfoCard } from "@/app/group/[group_id]/components/info-cart"
+import { Member, NewExpenseButton } from "@/app/group/[group_id]/components/new-expense-button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import prisma from "@/lib/prisma"
+import { cn } from "@/lib/utils"
 
 export type ExpenseWithSplits = Prisma.ExpenseGetPayload<{ include: { splits: true } }>
 
@@ -73,7 +74,7 @@ export default async function Page({ params }: PageProps) {
     return (
         <main className="max-w-screen-xl mx-auto w-full">
             <header className="border-b py-6 px-10">
-                <Button className="-ml-4" variant="ghost" asChild>
+                <Button asChild className="-ml-4" variant="ghost">
                     <Link href={"/"}>
                         <IoIosArrowRoundBack />
                         <span className="capitalize">all groups</span>
@@ -92,22 +93,22 @@ export default async function Page({ params }: PageProps) {
                     </div>
                     <ul className="flex items-center gap-x-1">
                         <li>
-                            <Button variant="ghost" className="size-10 [&_svg]:size-6">
+                            <Button className="size-10 [&_svg]:size-6" variant="ghost">
                                 <CiSettings />
                             </Button>
                         </li>
                         <li>
-                            <Button variant="ghost" className="size-10 [&_svg]:size-6">
+                            <Button className="size-10 [&_svg]:size-6" variant="ghost">
                                 <MdDelete />
                             </Button>
                         </li>
                         <li>
                             <NewExpenseButton
-                                members={members}
                                 groupId={group_id}
+                                members={members}
                                 userId={userId as string}
                             >
-                                <Button variant="secondary" className="[&_svg]:size-6">
+                                <Button className="[&_svg]:size-6" variant="secondary">
                                     <IoIosAdd />
                                     <span>New Expense</span>
                                 </Button>
@@ -125,16 +126,16 @@ export default async function Page({ params }: PageProps) {
                     </li>
                     <li className="flex-1 min-w-60">
                         <InfoCard
+                            description="have been done"
                             subTitle={`$${totalExpenses}`}
                             title={"Total Transactions"}
-                            description="have been done"
                         />
                     </li>
                     <li className="flex-1 min-w-60">
                         <InfoCard
+                            description="have joined"
                             subTitle={String(totalMembers)}
                             title={`Total ${totalMembers > 1 ? "Members" : "Member"}`}
-                            description="have joined"
                         />
                     </li>
                 </ul>
@@ -147,11 +148,11 @@ export default async function Page({ params }: PageProps) {
                     </p>
                     <span className="mt-6">
                         <NewExpenseButton
-                            members={members}
                             groupId={group_id}
+                            members={members}
                             userId={userId as string}
                         >
-                            <Button variant="secondary" className="[&_svg]:size-6">
+                            <Button className="[&_svg]:size-6" variant="secondary">
                                 <IoIosAdd />
                                 <span>New Expense</span>
                             </Button>
@@ -160,12 +161,12 @@ export default async function Page({ params }: PageProps) {
                 </div>
             ) : null}
             {Object.keys(expensesByMonth).map((month) => (
-                <div className="mt-6 text-sm px-4" key={month}>
+                <div key={month} className="mt-6 text-sm px-4">
                     <h4 className="font-semibold">{month}</h4>
                     <ul className="grid grid-cols-2 gap-4 mt-4">
                         {expensesByMonth[month].map((expense) => (
                             <li key={expense.id}>
-                                <ExpenseCard members={members} expense={expense} />
+                                <ExpenseCard expense={expense} members={members} />
                             </li>
                         ))}
                     </ul>

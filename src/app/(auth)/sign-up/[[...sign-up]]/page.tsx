@@ -2,6 +2,7 @@
 
 import { SignUp, useSignIn } from "@clerk/nextjs"
 import { useEffect, useState } from "react"
+
 import { FullScreenSpinner } from "@/components/ui/full-screen-spinner"
 import { cn } from "@/lib/utils"
 
@@ -10,9 +11,9 @@ export default function LoginPage() {
     const { isLoaded } = useSignIn()
 
     useEffect(() => {
-        let timeout: number | undefined
+        let timeout: NodeJS.Timeout | undefined
         if (isLoaded) {
-            const timeout = setTimeout(() => setShowSignUp(true), 200)
+            timeout = setTimeout(() => setShowSignUp(true), 200)
         }
         return () => {
             clearTimeout(timeout)
