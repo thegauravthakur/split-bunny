@@ -6,21 +6,22 @@ import { Button } from "@/components/ui/button"
 import { MdDelete } from "react-icons/md"
 import { IoIosAdd, IoIosArrowRoundBack } from "react-icons/io"
 import Link from "next/link"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import React from "react"
 import { cn } from "@/lib/utils"
-import { auth } from "@clerk/nextjs/server"
-import { CiReceipt } from "react-icons/ci"
-import { NewExpenseButton } from "@/app/group/[group_id]/components/new-expense-button"
-import { Expense } from "@prisma/client"
+import { auth, clerkClient, User } from "@clerk/nextjs/server"
+import { Member, NewExpenseButton } from "@/app/group/[group_id]/components/new-expense-button"
+import { Prisma } from "@prisma/client"
 import { format } from "date-fns"
-import { CiEdit } from "react-icons/ci"
+import { ExpenseCard } from "@/app/group/[group_id]/components/expense-cart"
+import { InfoCard } from "@/app/group/[group_id]/components/info-cart"
+
+export type ExpenseWithSplits = Prisma.ExpenseGetPayload<{ include: { splits: true } }>
 
 interface PageProps {
     params: Promise<{ group_id: string }>
 }
 
-function getExpensesByMonth(expenses: Expense[]) {
+function getExpensesByMonth(expenses: ExpenseWithSplits[]) {
     return expenses.reduce(
         (acc, expense) => {
             const month = format(expense.created_at, "MMMM")
@@ -28,8 +29,22 @@ function getExpensesByMonth(expenses: Expense[]) {
             acc[month].push(expense)
             return acc
         },
-        {} as Record<string, Expense[]>,
+        {} as Record<string, ExpenseWithSplits[]>,
     )
+}
+
+export async function getUserDetails(...userIds: string[]) {
+    const client = await clerkClient()
+    const users = await client.users.getUserList({ userId: userIds })
+    return users.data
+}
+
+function trimMembersDetails(users: User[]): Member[] {
+    return users.map((user) => ({
+        name: user.fullName ?? user.primaryEmailAddress?.emailAddress ?? user.id,
+        id: user.id,
+        image: user.imageUrl,
+    }))
 }
 
 export default async function Page({ params }: PageProps) {
@@ -44,7 +59,11 @@ export default async function Page({ params }: PageProps) {
     const expenses = await prisma.expense.findMany({
         where: { group_id: group_id },
         orderBy: { created_at: "desc" },
+        include: { splits: true },
     })
+
+    const userDetails = await getUserDetails(...group.member_ids)
+    const members = trimMembersDetails(userDetails)
 
     const totalExpenses = expenses.reduce((acc, expense) => acc + expense.amount, 0)
     const totalMembers = group.member_ids.length
@@ -83,7 +102,11 @@ export default async function Page({ params }: PageProps) {
                             </Button>
                         </li>
                         <li>
-                            <NewExpenseButton groupId={group_id}>
+                            <NewExpenseButton
+                                members={members}
+                                groupId={group_id}
+                                userId={userId as string}
+                            >
                                 <Button variant="secondary" className="[&_svg]:size-6">
                                     <IoIosAdd />
                                     <span>New Expense</span>
@@ -120,10 +143,14 @@ export default async function Page({ params }: PageProps) {
                 <div className="flex flex-col items-center justify-center gap-2 mt-6">
                     <h4 className="font-semibold">No Expenses</h4>
                     <p className="text-muted-foreground text-sm">
-                        You haven't added any expenses yet. Start by adding some.
+                        You haven&#39;t added any expenses yet. Start by adding some.
                     </p>
                     <span className="mt-6">
-                        <NewExpenseButton groupId={group_id}>
+                        <NewExpenseButton
+                            members={members}
+                            groupId={group_id}
+                            userId={userId as string}
+                        >
                             <Button variant="secondary" className="[&_svg]:size-6">
                                 <IoIosAdd />
                                 <span>New Expense</span>
@@ -138,57 +165,12 @@ export default async function Page({ params }: PageProps) {
                     <ul className="grid grid-cols-2 gap-4 mt-4">
                         {expensesByMonth[month].map((expense) => (
                             <li key={expense.id}>
-                                <ExpenseCard expense={expense} />
+                                <ExpenseCard members={members} expense={expense} />
                             </li>
                         ))}
                     </ul>
                 </div>
             ))}
         </main>
-    )
-}
-
-interface InfoCardProps {
-    title: string
-    subTitle: string
-    description: string
-}
-
-export function InfoCard({ title, subTitle, description }: InfoCardProps) {
-    return (
-        <Card>
-            <CardHeader className={cn("flex flex-row items-center justify-between space-y-0 pb-2")}>
-                <CardTitle className={cn("text-sm font-medium")}>{title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div className={cn("text-2xl font-bold")}>{subTitle}</div>
-                <p className="text-xs text-muted-foreground">{description}</p>
-            </CardContent>
-        </Card>
-    )
-}
-
-interface ExpenseCardProps {
-    expense: Expense
-}
-
-export function ExpenseCard({ expense }: ExpenseCardProps) {
-    return (
-        <div className={cn("rounded-xl border p-4 shadow-sm flex items-center gap-x-2")}>
-            <div className="flex flex-col text-muted-foreground">
-                <span>{format(expense.created_at, "MMM")}</span>
-                <span>{format(expense.created_at, "dd")}</span>
-            </div>
-            <CiReceipt fontSize={42} />
-            <div className="flex-1">
-                <h5 className="font-semibold">{expense.name}</h5>
-                <p className="text-sm text-muted-foreground">You paid ${expense.amount}</p>
-            </div>
-            <NewExpenseButton groupId={expense.group_id} expense={expense}>
-                <Button variant="ghost" className="size-10 [&_svg]:size-6">
-                    <CiEdit />
-                </Button>
-            </NewExpenseButton>
-        </div>
     )
 }

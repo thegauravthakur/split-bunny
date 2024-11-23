@@ -23,7 +23,7 @@ async function createGroup(name: string, _userId?: string): Promise<Result<Group
         }
 
         const group = await prisma.group.create({
-            data: { name, member_ids: [userId], main_image: "", cover_image: "" },
+            data: { name, member_ids: [userId], main_image: "" },
         })
 
         return ok(group)

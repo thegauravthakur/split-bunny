@@ -26,7 +26,6 @@ function handleGenericResponse<T, K>(response: Result<T, K>) {
         if (isSuccess) messages.forEach((message) => handleMessage(message, true))
         else messages.forEach((message) => handleMessage(message, false))
     }
-    console.log(response)
 
     response
         .map((messages) => handleResponse(messages, true))
@@ -39,6 +38,7 @@ export function ClientForm<T, K>({ onSubmitSuccess, ...props }: ClientFormProps)
             {...props}
             action={async (formData) => {
                 const _response = await props.action(formData)
+                console.log(_response)
                 const response = parseResultInterfaceFromObject<T, K>(_response)
                 console.log(response)
                 handleGenericResponse(response)
