@@ -49,7 +49,6 @@ export async function createGroupAction(formData: FormData) {
         const data = parseResult.error.errors.map((error) => error.message)
         return createParsableResultInterface(ok(data))
     }
-
     try {
         const response = await createGroup(name)
         if (response.isErr()) {

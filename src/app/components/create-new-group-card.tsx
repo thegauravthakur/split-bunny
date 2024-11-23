@@ -24,7 +24,7 @@ export function CreateNewGroupCard() {
                     </span>
                 </button>
             </DialogTrigger>
-            <DialogContent className="">
+            <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Create a new group</DialogTitle>
                     <DialogDescription>
@@ -33,14 +33,8 @@ export function CreateNewGroupCard() {
                 </DialogHeader>
                 <DialogBody className="mt-2">
                     <ClientForm action={createGroupAction} className="flex flex-col gap-y-4">
-                        <Label htmlFor="group-name">Group name</Label>
-                        <Input
-                            required
-                            id="group-name"
-                            name="name"
-                            placeholder="Flatmates"
-                            type="text"
-                        />
+                        <Label htmlFor="name">Group name</Label>
+                        <Input required id="name" name="name" placeholder="Family" type="text" />
                         <ClientFormButton className="mt-6">Create Group</ClientFormButton>
                     </ClientForm>
                 </DialogBody>
