@@ -66,8 +66,6 @@ export function NewExpenseButton({
     const splitConfig = createSplitConfig(people, amount)
     const isUpdateOperation = Boolean(expense)
 
-    console.log(expense)
-
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>{children}</DialogTrigger>
@@ -148,10 +146,18 @@ export function NewExpenseButton({
                                                 setPeople={setPeople}
                                             />
                                         </TabsContent>
-                                        <TabsContent className="" value="percentage">
+                                        <TabsContent
+                                            className="text-sm text-muted-foreground text-center"
+                                            value="percentage"
+                                        >
                                             coming soon
                                         </TabsContent>
-                                        <TabsContent value="amount">coming soon</TabsContent>
+                                        <TabsContent
+                                            className="text-sm text-muted-foreground text-center"
+                                            value="amount"
+                                        >
+                                            coming soon
+                                        </TabsContent>
                                     </Tabs>
                                 </PopoverContent>
                             </Popover>

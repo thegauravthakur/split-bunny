@@ -11,7 +11,7 @@ export default function LoginPage() {
     const { isLoaded } = useSignIn()
 
     useEffect(() => {
-        let timeout: NodeJS.Timeout | undefined
+        let timeout: ReturnType<typeof setTimeout>
         if (isLoaded) {
             timeout = setTimeout(() => setShowSignUp(true), 200)
         }
