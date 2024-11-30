@@ -5,6 +5,7 @@ import { CiEdit, CiReceipt } from "react-icons/ci"
 
 import { ExpenseWithSplits } from "@/app/group/[group_id]/(tabs)/expenses/page"
 import { Member, NewExpenseButton } from "@/app/group/[group_id]/components/new-expense-button"
+import { formattedNumber } from "@/app/utils/words"
 import { Button } from "@/components/ui/button"
 import {
     Drawer,
@@ -34,7 +35,7 @@ export async function ExpenseCard({ expense, members }: ExpenseCardProps) {
                 <DrawerTrigger asChild>
                     <Button
                         aria-label="show expense details"
-                        className="absolute inset-0 h-full w-full"
+                        className="absolute inset-0 h-full w-full hover:bg-transparent"
                         variant="ghost"
                     />
                 </DrawerTrigger>
@@ -45,8 +46,9 @@ export async function ExpenseCard({ expense, members }: ExpenseCardProps) {
                 <CiReceipt fontSize={42} />
                 <div className="flex-1">
                     <h5 className="font-semibold">{expense.name}</h5>
-                    <p className="text-sm text-muted-foreground">
-                        {isPaidByMe ? "You paid" : paidBy + " paid"} ₹{expense.amount}
+                    <p className="text-sm text-muted-foreground flex items-center gap-1">
+                        <span>{isPaidByMe ? "You paid" : paidBy + " paid"}</span>
+                        <span>{formattedNumber(expense.amount)}</span>
                     </p>
                 </div>
                 <NewExpenseButton

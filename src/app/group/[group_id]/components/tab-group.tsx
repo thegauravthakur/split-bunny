@@ -21,6 +21,7 @@ export function TabGroup({ group_id }: TabGroupProps) {
                     <Link
                         className={cn(
                             "text-sm border px-4 py-1.5 rounded-xl hover:bg-primary-foreground hover:border-primary transition-colors duration-200 capitalize",
+                            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                             activeTab === tab && "bg-primary-foreground border-primary",
                         )}
                         href={`/group/${group_id}/${tab}`}
