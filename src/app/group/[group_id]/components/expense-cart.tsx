@@ -3,7 +3,7 @@ import { format } from "date-fns"
 import React from "react"
 import { CiEdit, CiReceipt } from "react-icons/ci"
 
-import { ExpenseWithSplits } from "@/app/group/[group_id]/[[...tab]]/page"
+import { ExpenseWithSplits } from "@/app/group/[group_id]/(tabs)/expenses/page"
 import { Member, NewExpenseButton } from "@/app/group/[group_id]/components/new-expense-button"
 import { Button } from "@/components/ui/button"
 import {

@@ -3,7 +3,7 @@
 import React, { ReactNode, useState } from "react"
 import { LiaRupeeSignSolid } from "react-icons/lia"
 
-import { ExpenseWithSplits } from "@/app/group/[group_id]/[[...tab]]/page"
+import { ExpenseWithSplits } from "@/app/group/[group_id]/(tabs)/expenses/page"
 import { createExpenseAction } from "@/app/group/[group_id]/action"
 import {
     createSplitConfig,

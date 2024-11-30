@@ -4,7 +4,7 @@ import { notFound } from "next/navigation"
 import React, { ReactNode } from "react"
 import { IoIosAdd, IoIosArrowRoundBack } from "react-icons/io"
 
-import { getUserDetails, trimMembersDetails } from "@/app/group/[group_id]/[[...tab]]/utils"
+import { getUserDetails, trimMembersDetails } from "@/app/group/[group_id]/(tabs)/utils"
 import { NewExpenseButton } from "@/app/group/[group_id]/components/new-expense-button"
 import { TabGroup } from "@/app/group/[group_id]/components/tab-group"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -33,7 +33,7 @@ export default async function Layout({ params, children }: LayoutProps) {
         <div className="max-w-screen-xl mx-auto w-full">
             <header className="border-b py-6 px-10">
                 <Button asChild className="-ml-4" variant="ghost">
-                    <Link href={"/public"}>
+                    <Link href={"/"}>
                         <IoIosArrowRoundBack />
                         <span className="capitalize">all groups</span>
                     </Link>

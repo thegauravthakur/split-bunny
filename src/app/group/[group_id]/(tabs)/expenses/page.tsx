@@ -5,8 +5,7 @@ import { notFound } from "next/navigation"
 import React from "react"
 import { IoIosAdd } from "react-icons/io"
 
-import { tabs } from "@/app/group/[group_id]/[[...tab]]/constants"
-import { getUserDetails, trimMembersDetails } from "@/app/group/[group_id]/[[...tab]]/utils"
+import { getUserDetails, trimMembersDetails } from "@/app/group/[group_id]/(tabs)/utils"
 import { ExpenseCard } from "@/app/group/[group_id]/components/expense-cart"
 import { NewExpenseButton } from "@/app/group/[group_id]/components/new-expense-button"
 import { Button } from "@/components/ui/button"
@@ -15,7 +14,7 @@ import prisma from "@/lib/prisma"
 export type ExpenseWithSplits = Prisma.ExpenseGetPayload<{ include: { splits: true } }>
 
 interface PageProps {
-    params: Promise<{ group_id: string; tab: string[] }>
+    params: Promise<{ group_id: string }>
 }
 
 function getExpensesByMonth(expenses: ExpenseWithSplits[]) {
@@ -31,10 +30,7 @@ function getExpensesByMonth(expenses: ExpenseWithSplits[]) {
 }
 
 export default async function Page({ params }: PageProps) {
-    const { group_id, tab } = await params
-    const [activeTab] = tab ?? ["expenses"]
-
-    if (activeTab && !tabs.includes(activeTab)) notFound()
+    const { group_id } = await params
 
     const { userId } = await auth()
     const group = await prisma.group.findUnique({

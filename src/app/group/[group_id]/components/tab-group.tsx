@@ -1,18 +1,18 @@
 "use client"
 
 import Link from "next/link"
-import { useParams } from "next/navigation"
+import { usePathname } from "next/navigation"
 import React from "react"
 
-import { tabs } from "@/app/group/[group_id]/[[...tab]]/constants"
+import { tabs } from "@/app/group/[group_id]/(tabs)/constants"
 import { cn } from "@/lib/utils"
 
 interface TabGroupProps {
     group_id: string
 }
 export function TabGroup({ group_id }: TabGroupProps) {
-    const { tab } = useParams()
-    const [activeTab] = tab ?? ["expenses"]
+    const pathname = usePathname()
+    const activeTab = pathname.split(group_id).at(1)?.replace("/", "")
 
     return (
         <ul className="flex items-center gap-x-2 mt-6">
