@@ -3,6 +3,7 @@
 import React, { ReactNode, useEffect, useState } from "react"
 import { LiaRupeeSignSolid } from "react-icons/lia"
 
+import { DialogBottomSheet } from "@/app/components/dialog-bottom-sheet"
 import { ExpenseWithSplits } from "@/app/group/[group_id]/(tabs)/expenses/page"
 import { createExpenseAction } from "@/app/group/[group_id]/action"
 import {
@@ -12,14 +13,6 @@ import {
 } from "@/app/group/[group_id]/components/split-equally-section"
 import { ClientForm, ClientFormButton } from "@/components/helpers/client-form"
 import { Button } from "@/components/ui/button"
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -80,19 +73,9 @@ export function NewExpenseButton({
     }, [])
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>{children}</DialogTrigger>
-            <DialogContent className="">
-                <DialogHeader>
-                    <DialogTitle>
-                        {isUpdateOperation ? "Edit Expense" : "Create a new expense"}
-                    </DialogTitle>
-                    <DialogDescription>
-                        {!isUpdateOperation
-                            ? "Create a new expense and start splitting bills"
-                            : "Edit the expense details"}
-                    </DialogDescription>
-                </DialogHeader>
+        <DialogBottomSheet
+            modal
+            body={
                 <ClientForm
                     action={createExpenseAction}
                     className="flex flex-col gap-y-4"
@@ -206,7 +189,16 @@ export function NewExpenseButton({
                     ) : null}
                     <ClientFormButton className="mt-6">Create Expense</ClientFormButton>
                 </ClientForm>
-            </DialogContent>
-        </Dialog>
+            }
+            description={
+                isUpdateOperation
+                    ? "Edit the expense details"
+                    : "Create a new expense and start splitting bills"
+            }
+            open={isOpen}
+            setOpen={setIsOpen}
+            title={isUpdateOperation ? `Edit Expense` : "Create a new expense"}
+            trigger={children}
+        />
     )
 }

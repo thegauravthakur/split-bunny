@@ -28,6 +28,8 @@ interface DialogBottomSheetProps {
     description?: ReactNode
     body: ReactNode
     modal?: boolean
+    open?: boolean
+    setOpen?: (open: boolean) => void
 }
 
 export function DialogBottomSheet({
@@ -36,13 +38,15 @@ export function DialogBottomSheet({
     description,
     body,
     modal,
+    open,
+    setOpen,
     closeElement,
 }: DialogBottomSheetProps) {
     const isDesktop = useMediaQuery("(min-width: 768px)")
 
     if (isDesktop)
         return (
-            <Dialog modal={modal}>
+            <Dialog modal={modal} open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>{trigger}</DialogTrigger>
                 <DialogContent className="">
                     <DialogHeader>
@@ -56,7 +60,7 @@ export function DialogBottomSheet({
         )
 
     return (
-        <Drawer>
+        <Drawer open={open} onOpenChange={setOpen}>
             <DrawerTrigger asChild>{trigger}</DrawerTrigger>
             <DrawerContent className="px-2 pb-4">
                 <DrawerHeader className="">
