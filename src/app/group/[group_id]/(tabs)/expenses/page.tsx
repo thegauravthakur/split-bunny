@@ -55,7 +55,7 @@ export default async function Page({ params }: PageProps) {
             {expenses.length === 0 ? (
                 <div className="flex flex-col items-center justify-center gap-2 mt-6">
                     <h4 className="font-semibold">No Expenses</h4>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-muted-foreground text-sm max-w-72 text-center">
                         You haven&#39;t added any expenses yet. Start by adding some.
                     </p>
                     <span className="mt-6">

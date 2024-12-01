@@ -48,7 +48,7 @@ export default async function Layout({ params, children }: LayoutProps) {
                         userId={userId as string}
                     >
                         <Button
-                            className="fixed z-20 bg-white md:static shadow-md md:shadow-none bottom-4 right-4 size-10 md:size-auto [&_svg]:size-8 md:[&_svg]:size-6"
+                            className="fixed z-20 bg-white md:static shadow-md md:shadow-none bottom-12 border right-6 size-10 md:size-auto [&_svg]:size-8 md:[&_svg]:size-6"
                             variant="secondary"
                         >
                             <IoIosAdd className="bg-white" />
