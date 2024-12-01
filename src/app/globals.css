@@ -72,7 +72,7 @@
 }
 
 div.cl-rootBox {
-    @apply w-full max-w-md;
+    @apply w-full max-w-md px-2.5;
 }
 
 div.cl-cardBox {

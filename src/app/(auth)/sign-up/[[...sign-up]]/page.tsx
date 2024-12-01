@@ -23,7 +23,7 @@ export default function LoginPage() {
     return (
         <main className="flex items-center justify-center flex-1">
             {!showSignUp && <FullScreenSpinner />}
-            <span className={cn("w-full flex justify-center", !showSignUp && "invisible")}>
+            <span className={cn("w-full flex justify-center mt-6", !showSignUp && "invisible")}>
                 <SignUp />
             </span>
         </main>
