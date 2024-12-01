@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/dialog"
 import {
     Drawer,
-    DrawerClose,
     DrawerContent,
     DrawerDescription,
     DrawerHeader,
@@ -60,7 +59,7 @@ export function DialogBottomSheet({
         )
 
     return (
-        <Drawer open={open} onOpenChange={setOpen}>
+        <Drawer open={open} repositionInputs={false} onOpenChange={setOpen}>
             <DrawerTrigger asChild>{trigger}</DrawerTrigger>
             <DrawerContent className="px-2 pb-4">
                 <DrawerHeader className="">
@@ -69,7 +68,6 @@ export function DialogBottomSheet({
                 </DrawerHeader>
                 {body}
             </DrawerContent>
-            {closeElement ? <DrawerClose>{closeElement}</DrawerClose> : null}
         </Drawer>
     )
 }
