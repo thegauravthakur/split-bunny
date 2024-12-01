@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils"
 interface TabGroupProps {
     group_id: string
 }
+
 export function TabGroup({ group_id }: TabGroupProps) {
     const pathname = usePathname()
     const activeTab = pathname.split(group_id).at(1)?.replace("/", "")
