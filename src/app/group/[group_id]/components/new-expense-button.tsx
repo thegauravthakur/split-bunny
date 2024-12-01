@@ -11,6 +11,7 @@ import {
     People,
     SplitEquallySection,
 } from "@/app/group/[group_id]/components/split-equally-section"
+import { useMediaQuery } from "@/app/hooks/use-media-query"
 import { ClientForm, ClientFormButton } from "@/components/helpers/client-form"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -47,6 +48,7 @@ export function NewExpenseButton({
     members,
     userId,
 }: NewExpenseButtonProps) {
+    const isDesktop = useMediaQuery("(min-width: 768px)")
     const [isOpen, setIsOpen] = useState(false)
     const [amount, setAmount] = useState(expense?.amount ?? 0)
     const [people, setPeople] = useState<People[]>(() => {
@@ -84,6 +86,7 @@ export function NewExpenseButton({
                     <Label htmlFor="expense-name">Expense name</Label>
                     <Input
                         required
+                        className="text-base"
                         defaultValue={expense?.name}
                         id="expense-name"
                         name="name"
@@ -113,17 +116,21 @@ export function NewExpenseButton({
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent>
-                                    <Label>Amount</Label>
-                                    <Input
-                                        required
-                                        className="mt-2"
-                                        placeholder="Enter amount"
-                                        startIcon={LiaRupeeSignSolid}
-                                        type="number"
-                                        value={amount}
-                                        onChange={(e) => setAmount(Number(e.target.value))}
-                                    />
-                                    <Tabs className="mt-4 w-full" defaultValue="account">
+                                    {isDesktop ? (
+                                        <>
+                                            <Label>Amount</Label>
+                                            <Input
+                                                required
+                                                className="mt-2"
+                                                placeholder="Enter amount"
+                                                startIcon={LiaRupeeSignSolid}
+                                                type="number"
+                                                value={amount}
+                                                onChange={(e) => setAmount(Number(e.target.value))}
+                                            />
+                                        </>
+                                    ) : null}
+                                    <Tabs className="md:mt-4 w-full" defaultValue="account">
                                         <TabsList className="w-full">
                                             <TabsTrigger className="flex-1" value="account">
                                                 Equal

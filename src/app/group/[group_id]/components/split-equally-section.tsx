@@ -68,12 +68,14 @@ export function SplitEquallySection({
                     </li>
                 ))}
             </ul>
-            <p className="text-sm mt-4 flex flex-col items-center border-t pt-4">
-                <span>₹{safeNumber(amount / selectedPeople.length)}/person</span>
-                <span className="text-xs text-muted-foreground">
-                    ({selectedPeople.length} people)
-                </span>
-            </p>
+            {amount > 0 ? (
+                <p className="text-sm mt-4 flex flex-col items-center border-t pt-4">
+                    <span>₹{safeNumber(amount / selectedPeople.length)}/person</span>
+                    <span className="text-xs text-muted-foreground">
+                        ({selectedPeople.length} people)
+                    </span>
+                </p>
+            ) : null}
         </div>
     )
 }
