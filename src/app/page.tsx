@@ -3,6 +3,7 @@ import { format } from "date-fns"
 import Link from "next/link"
 
 import { CreateNewGroupCard } from "@/app/components/create-new-group-card"
+import { PlainCard } from "@/app/components/plain-cart"
 import prisma from "@/lib/prisma"
 import { cn } from "@/lib/utils"
 
@@ -14,20 +15,19 @@ export default async function Home() {
     })
 
     return (
-        <div>
-            <main className={cn("max-w-screen-lg mx-auto grid grid-cols-3 gap-4 mt-20")}>
+        <div className="max-w-screen-lg md:mx-auto px-4">
+            <h3 className="text-lg font-bold mt-10 mb-4 capitalize">groups</h3>
+            <main className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full")}>
                 <CreateNewGroupCard />
                 {groups.map((group) => (
-                    <Link
+                    <PlainCard
                         key={group.id}
-                        className="border rounded-md shadow p-4 flex flex-col justify-between gap-y-4"
-                        href={`/group/${group.id}`}
-                    >
-                        <h3 className="capitalize">{group.name}</h3>
-                        <p className="text-sm text-muted-foreground">
-                            {format(group.created_at, "MMMM dd, yyyy")}
-                        </p>
-                    </Link>
+                        description={format(group.created_at, "MMMM dd, yyyy")}
+                        title={group.name}
+                        triggerElement={
+                            <Link aria-label={group.name} href={`/group/${group.id}`} />
+                        }
+                    />
                 ))}
             </main>
         </div>

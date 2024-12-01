@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 interface SplitEquallySectionProps {
     amount: number
     people: People[]
+    userId: string
     setPeople: (people: People[]) => void
 }
 
@@ -24,7 +25,12 @@ export function createSplitConfig(people: People[], amount: number) {
     }))
 }
 
-export function SplitEquallySection({ amount, people, setPeople }: SplitEquallySectionProps) {
+export function SplitEquallySection({
+    amount,
+    people,
+    setPeople,
+    userId,
+}: SplitEquallySectionProps) {
     const selectedPeople = people.filter((p) => p.isChecked)
 
     return (
@@ -40,7 +46,9 @@ export function SplitEquallySection({ amount, people, setPeople }: SplitEquallyS
                                 src={person.image}
                                 width={32}
                             />
-                            <span className="select-none pointer-events-none">{person.name}</span>
+                            <span className="select-none pointer-events-none">
+                                {person.id === userId ? "You" : person.name}
+                            </span>
                             <Checkbox
                                 checked={person.isChecked}
                                 onCheckedChange={(checked) => {

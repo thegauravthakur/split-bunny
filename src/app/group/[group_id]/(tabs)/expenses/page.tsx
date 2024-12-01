@@ -73,9 +73,9 @@ export default async function Page({ params }: PageProps) {
                 </div>
             ) : null}
             {Object.keys(expensesByMonth).map((month) => (
-                <div key={month} className="mt-6 text-sm px-4">
+                <div key={month} className="mt-6 text-sm">
                     <h4 className="font-semibold">{month}</h4>
-                    <ul className="grid grid-cols-2 gap-4 mt-4">
+                    <ul className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
                         {expensesByMonth[month].map((expense) => (
                             <li key={expense.id} className="">
                                 <ExpenseCard expense={expense} members={members} />

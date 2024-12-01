@@ -31,7 +31,7 @@ export default async function Layout({ params, children }: LayoutProps) {
 
     return (
         <div className="max-w-screen-xl mx-auto w-full">
-            <header className="border-b py-6 px-10">
+            <header className="border-b py-4 lg:py-6 px-2 md:px-6 lg:px-10">
                 <Button asChild className="-ml-4" variant="ghost">
                     <Link href={"/"}>
                         <IoIosArrowRoundBack />
@@ -39,7 +39,7 @@ export default async function Layout({ params, children }: LayoutProps) {
                     </Link>
                 </Button>
                 <div className="flex items-center gap-x-4 mt-4">
-                    <Avatar className="size-16">
+                    <Avatar className="size-14 md:size-16">
                         <AvatarImage src="https://github.com/thegauravthakur.png" />
                         <AvatarFallback>GT</AvatarFallback>
                     </Avatar>
@@ -54,15 +54,20 @@ export default async function Layout({ params, children }: LayoutProps) {
                         members={members}
                         userId={userId as string}
                     >
-                        <Button className="[&_svg]:size-6" variant="secondary">
+                        <Button
+                            className="fixed md:static shadow md:shadow-none bottom-4 right-4 size-10 md:size-auto [&_svg]:size-8 md:[&_svg]:size-6"
+                            variant="secondary"
+                        >
                             <IoIosAdd />
-                            <span>New Expense</span>
+                            <span className="hidden md:block">New Expense</span>
                         </Button>
                     </NewExpenseButton>
                 </div>
             </header>
-            <TabGroup group_id={group_id} />
-            {children}
+            <div className="px-2 md:px-4 lg:px-10">
+                <TabGroup group_id={group_id} />
+                {children}
+            </div>
         </div>
     )
 }

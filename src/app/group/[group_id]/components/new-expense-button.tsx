@@ -1,6 +1,6 @@
 "use client"
 
-import React, { ReactNode, useState } from "react"
+import React, { ReactNode, useEffect, useState } from "react"
 import { LiaRupeeSignSolid } from "react-icons/lia"
 
 import { ExpenseWithSplits } from "@/app/group/[group_id]/(tabs)/expenses/page"
@@ -65,6 +65,19 @@ export function NewExpenseButton({
     })
     const splitConfig = createSplitConfig(people, amount)
     const isUpdateOperation = Boolean(expense)
+
+    useEffect(() => {
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.metaKey && event.key.toLowerCase() === "n") {
+                event.preventDefault()
+                setIsOpen(true)
+            }
+        }
+        document.addEventListener("keydown", onKeyDown)
+        return () => {
+            document.removeEventListener("keydown", onKeyDown)
+        }
+    }, [])
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -144,6 +157,7 @@ export function NewExpenseButton({
                                                 amount={amount}
                                                 people={people}
                                                 setPeople={setPeople}
+                                                userId={userId}
                                             />
                                         </TabsContent>
                                         <TabsContent
