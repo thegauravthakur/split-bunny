@@ -47,7 +47,7 @@ export default async function Page({ params }: PageProps) {
     }))
 
     return (
-        <ul className="grid grid-cols-2 gap-4 mt-10">
+        <ul className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-10">
             {members.map((member) => (
                 <li key={member.name}>
                     <MemberCard member={member} />
