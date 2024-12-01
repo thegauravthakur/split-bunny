@@ -1,5 +1,6 @@
 "use client"
 import { ReactNode } from "react"
+import { Drawer } from "vaul"
 
 import { useMediaQuery } from "@/app/hooks/use-media-query"
 import {
@@ -11,14 +12,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import {
-    Drawer,
-    DrawerContent,
-    DrawerDescription,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger,
-} from "@/components/ui/drawer"
 
 interface DialogBottomSheetProps {
     trigger: ReactNode
@@ -59,15 +52,29 @@ export function DialogBottomSheet({
         )
 
     return (
-        <Drawer open={open} repositionInputs={false} onOpenChange={setOpen}>
-            <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-            <DrawerContent className="px-2 pb-4">
-                <DrawerHeader className="">
-                    {title ? <DrawerTitle>{title}</DrawerTitle> : null}
-                    {description ? <DrawerDescription>{description}</DrawerDescription> : null}
-                </DrawerHeader>
-                {body}
-            </DrawerContent>
-        </Drawer>
+        <Drawer.Root>
+            <Drawer.Trigger asChild>{trigger}</Drawer.Trigger>
+            <Drawer.Portal>
+                <Drawer.Overlay className="fixed inset-0 bg-black/40" />
+                <Drawer.Content className="bg-white z-20 flex flex-col fixed bottom-0 left-0 right-0 rounded-t-[10px]">
+                    <div className="max-w-md w-full mx-auto overflow-auto p-4 rounded-t-[10px]">
+                        <Drawer.Handle />
+                        <div className="text-center mt-4 mb-8">
+                            {title ? (
+                                <Drawer.Title className="text-lg font-semibold">
+                                    {title}
+                                </Drawer.Title>
+                            ) : null}
+                            {description ? (
+                                <Drawer.Description className="text-muted-foreground">
+                                    {description}
+                                </Drawer.Description>
+                            ) : null}
+                        </div>
+                        {body}
+                    </div>
+                </Drawer.Content>
+            </Drawer.Portal>
+        </Drawer.Root>
     )
 }
