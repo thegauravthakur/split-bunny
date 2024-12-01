@@ -1,8 +1,7 @@
 import { auth } from "@clerk/nextjs/server"
-import Link from "next/link"
 import { notFound } from "next/navigation"
 import React, { ReactNode } from "react"
-import { IoIosAdd, IoIosArrowRoundBack } from "react-icons/io"
+import { IoIosAdd } from "react-icons/io"
 
 import { getUserDetails, trimMembersDetails } from "@/app/group/[group_id]/(tabs)/utils"
 import { NewExpenseButton } from "@/app/group/[group_id]/components/new-expense-button"
@@ -30,15 +29,9 @@ export default async function Layout({ params, children }: LayoutProps) {
     const members = trimMembersDetails(userDetails)
 
     return (
-        <div className="max-w-screen-xl mx-auto w-full">
-            <header className="border-b py-4 lg:py-6 px-2 md:px-6 lg:px-10">
-                <Button asChild className="-ml-4" variant="ghost">
-                    <Link href={"/"}>
-                        <IoIosArrowRoundBack />
-                        <span className="capitalize">all groups</span>
-                    </Link>
-                </Button>
-                <div className="flex items-center gap-x-4 mt-4">
+        <div className="max-w-screen-xl mx-auto w-full mb-10">
+            <header className="border-b py-6 lg:py-6 px-2 md:px-6 lg:px-10">
+                <div className="flex items-center gap-x-4">
                     <Avatar className="size-14 md:size-16">
                         <AvatarImage src="https://github.com/thegauravthakur.png" />
                         <AvatarFallback>GT</AvatarFallback>
@@ -55,10 +48,10 @@ export default async function Layout({ params, children }: LayoutProps) {
                         userId={userId as string}
                     >
                         <Button
-                            className="fixed md:static shadow md:shadow-none bottom-4 right-4 size-10 md:size-auto [&_svg]:size-8 md:[&_svg]:size-6"
+                            className="fixed z-20 bg-white md:static shadow-md md:shadow-none bottom-4 right-4 size-10 md:size-auto [&_svg]:size-8 md:[&_svg]:size-6"
                             variant="secondary"
                         >
-                            <IoIosAdd />
+                            <IoIosAdd className="bg-white" />
                             <span className="hidden md:block">New Expense</span>
                         </Button>
                     </NewExpenseButton>
