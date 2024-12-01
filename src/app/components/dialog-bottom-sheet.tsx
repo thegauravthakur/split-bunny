@@ -56,7 +56,7 @@ export function DialogBottomSheet({
         )
 
     return (
-        <Drawer autoFocus modal={modal}>
+        <Drawer>
             <DrawerTrigger asChild>{trigger}</DrawerTrigger>
             <DrawerContent className="px-2 pb-4">
                 <DrawerHeader className="">
