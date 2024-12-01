@@ -20,6 +20,7 @@ export function TabGroup({ group_id }: TabGroupProps) {
             {tabs.map((tab = "expenses") => (
                 <li key={tab}>
                     <Link
+                        replace
                         className={cn(
                             "text-sm border px-4 py-1.5 rounded-xl hover:bg-primary-foreground hover:border-primary transition-colors duration-200 capitalize",
                             "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
