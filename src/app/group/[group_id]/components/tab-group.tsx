@@ -18,11 +18,11 @@ export function TabGroup({ group_id }: TabGroupProps) {
     return (
         <ul className="flex items-center gap-x-2 mt-6">
             {tabs.map((tab = "expenses") => (
-                <li key={tab}>
+                <li key={tab} className="flex-1 md:flex-initial">
                     <Link
                         replace
                         className={cn(
-                            "text-sm border px-4 py-1.5 rounded-xl hover:bg-primary-foreground hover:border-primary transition-colors duration-200 capitalize",
+                            "text-sm border px-4 inline-block w-full text-center py-1.5 rounded-xl hover:bg-primary-foreground hover:border-primary transition-colors duration-200 capitalize",
                             "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                             activeTab === tab && "bg-primary-foreground border-primary",
                         )}
