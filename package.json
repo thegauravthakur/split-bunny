@@ -11,6 +11,7 @@
   "dependencies": {
     "@clerk/clerk-js": "^5.34.2",
     "@clerk/nextjs": "^6.3.4",
+    "@next/bundle-analyzer": "^15.0.3",
     "@prisma/client": "^5.22.0",
     "@radix-ui/react-avatar": "^1.1.1",
     "@radix-ui/react-checkbox": "^1.1.2",

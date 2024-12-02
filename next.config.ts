@@ -1,4 +1,7 @@
+// import BundleAnalyzer from "@next/bundle-analyzer"
 import type { NextConfig } from "next"
+
+// const withBundleAnalyzer = BundleAnalyzer()
 
 const nextConfig: NextConfig = {
     eslint: {

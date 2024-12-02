@@ -3,6 +3,7 @@ import { ReactNode } from "react"
 import { Drawer } from "vaul"
 
 import { useMediaQuery } from "@/app/hooks/use-media-query"
+import { Button } from "@/components/ui/button"
 import {
     Dialog,
     DialogClose,
@@ -72,6 +73,11 @@ export function DialogBottomSheet({
                             ) : null}
                         </div>
                         {body}
+                        <Drawer.Close asChild>
+                            <Button autoFocus className="w-full mt-2" variant="outline">
+                                Close
+                            </Button>
+                        </Drawer.Close>
                     </div>
                 </Drawer.Content>
             </Drawer.Portal>
