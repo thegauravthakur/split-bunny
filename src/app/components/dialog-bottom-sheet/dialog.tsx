@@ -23,6 +23,7 @@ export function Dialog({
 }: DialogBottomSheetProps) {
     return (
         <_Dialog modal={modal} open={open} onOpenChange={setOpen}>
+            <p>gaurav-apple</p>
             <DialogTrigger asChild>{trigger}</DialogTrigger>
             <DialogContent className="">
                 <DialogHeader>

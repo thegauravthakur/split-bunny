@@ -24,7 +24,7 @@ export interface DialogBottomSheetProps {
     setOpen?: (open: boolean) => void
 }
 
-export async function DialogBottomSheet(props: DialogBottomSheetProps) {
+export function DialogBottomSheet(props: DialogBottomSheetProps) {
     if (props.device === "desktop") return <Dialog {...props} />
     return <Drawer {...props} />
 }
