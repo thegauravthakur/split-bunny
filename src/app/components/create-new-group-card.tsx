@@ -1,12 +1,14 @@
 import { createGroupAction } from "@/app/action"
 import { DialogBottomSheet } from "@/app/components/dialog-bottom-sheet/dialog-bottom-sheet"
 import { PlainCard } from "@/app/components/plain-cart"
+import { getDevice } from "@/app/utils/device/device.server"
 import { ClientForm, ClientFormButton } from "@/components/helpers/client-form"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-export function CreateNewGroupCard() {
+export async function CreateNewGroupCard() {
+    const device = await getDevice()
     return (
         <DialogBottomSheet
             modal
@@ -18,6 +20,7 @@ export function CreateNewGroupCard() {
                 </ClientForm>
             }
             description="Create a new group and start splitting bills"
+            device={device}
             title="Create a new group"
             trigger={
                 <Button

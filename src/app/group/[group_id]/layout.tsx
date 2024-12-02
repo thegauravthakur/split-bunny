@@ -6,6 +6,7 @@ import { IoIosAdd } from "react-icons/io"
 import { getUserDetails, trimMembersDetails } from "@/app/group/[group_id]/(tabs)/utils"
 import { NewExpenseButton } from "@/app/group/[group_id]/components/new-expense-button"
 import { TabGroup } from "@/app/group/[group_id]/components/tab-group"
+import { getDevice } from "@/app/utils/device/device.server"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import prisma from "@/lib/prisma"
@@ -17,6 +18,7 @@ interface LayoutProps {
 
 export default async function Layout({ params, children }: LayoutProps) {
     const { group_id } = await params
+    const device = await getDevice()
 
     const { userId } = await auth()
     const group = await prisma.group.findUnique({
@@ -43,6 +45,7 @@ export default async function Layout({ params, children }: LayoutProps) {
                         </p>
                     </div>
                     <NewExpenseButton
+                        device={device}
                         groupId={group_id}
                         members={members}
                         userId={userId as string}

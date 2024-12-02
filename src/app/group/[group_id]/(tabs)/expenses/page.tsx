@@ -8,6 +8,7 @@ import { IoIosAdd } from "react-icons/io"
 import { getUserDetails, trimMembersDetails } from "@/app/group/[group_id]/(tabs)/utils"
 import { ExpenseCard } from "@/app/group/[group_id]/components/expense-cart"
 import { NewExpenseButton } from "@/app/group/[group_id]/components/new-expense-button"
+import { getDevice } from "@/app/utils/device/device.server"
 import { Button } from "@/components/ui/button"
 import prisma from "@/lib/prisma"
 
@@ -31,6 +32,7 @@ function getExpensesByMonth(expenses: ExpenseWithSplits[]) {
 
 export default async function Page({ params }: PageProps) {
     const { group_id } = await params
+    const device = await getDevice()
 
     const { userId } = await auth()
     const group = await prisma.group.findUnique({
@@ -60,6 +62,7 @@ export default async function Page({ params }: PageProps) {
                     </p>
                     <span className="mt-6">
                         <NewExpenseButton
+                            device={device}
                             groupId={group_id}
                             members={members}
                             userId={userId as string}

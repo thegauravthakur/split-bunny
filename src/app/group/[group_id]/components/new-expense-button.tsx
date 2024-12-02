@@ -1,6 +1,6 @@
 "use client"
 
-import React, { ReactNode, useEffect, useState } from "react"
+import React, { ReactNode, useState } from "react"
 import { LiaRupeeSignSolid } from "react-icons/lia"
 
 import { DialogBottomSheet } from "@/app/components/dialog-bottom-sheet/dialog-bottom-sheet"
@@ -38,6 +38,7 @@ interface NewExpenseButtonProps {
     expense?: ExpenseWithSplits
     children: ReactNode
     members: Member[]
+    device: "mobile" | "desktop"
     userId: string
 }
 
@@ -46,6 +47,7 @@ export function NewExpenseButton({
     expense,
     children,
     members,
+    device,
     userId,
 }: NewExpenseButtonProps) {
     const isDesktop = useMediaQuery("(min-width: 768px)")
@@ -60,19 +62,6 @@ export function NewExpenseButton({
     })
     const splitConfig = createSplitConfig(people, amount)
     const isUpdateOperation = Boolean(expense)
-
-    useEffect(() => {
-        const onKeyDown = (event: KeyboardEvent) => {
-            if (event.metaKey && event.key.toLowerCase() === "n") {
-                event.preventDefault()
-                setIsOpen(true)
-            }
-        }
-        document.addEventListener("keydown", onKeyDown)
-        return () => {
-            document.removeEventListener("keydown", onKeyDown)
-        }
-    }, [])
 
     return (
         <DialogBottomSheet
@@ -202,6 +191,7 @@ export function NewExpenseButton({
                     ? "Edit the expense details"
                     : "Create a new expense and start splitting bills"
             }
+            device={device}
             open={isOpen}
             setOpen={setIsOpen}
             title={isUpdateOperation ? `Edit Expense` : "Create a new expense"}

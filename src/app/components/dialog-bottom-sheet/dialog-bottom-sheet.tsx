@@ -1,7 +1,16 @@
+"use client"
+import dynamic from "next/dynamic"
 import { ReactNode } from "react"
 
-import { DialogBottomSheetWrapper } from "@/app/components/dialog-bottom-sheet/dialog-bottom-sheet-wrapper"
-import { getDevice } from "@/app/utils/device/device.server"
+const Drawer = dynamic(
+    () => import("@/app/components/dialog-bottom-sheet/drawer").then((m) => m.Drawer),
+    { ssr: true },
+)
+
+const Dialog = dynamic(
+    () => import("@/app/components/dialog-bottom-sheet/dialog").then((m) => m.Dialog),
+    { ssr: true },
+)
 
 export interface DialogBottomSheetProps {
     trigger: ReactNode
@@ -11,10 +20,11 @@ export interface DialogBottomSheetProps {
     body: ReactNode
     modal?: boolean
     open?: boolean
+    device?: "mobile" | "desktop"
     setOpen?: (open: boolean) => void
 }
 
 export async function DialogBottomSheet(props: DialogBottomSheetProps) {
-    const device = await getDevice()
-    return <DialogBottomSheetWrapper device={device} {...props} />
+    if (props.device === "desktop") return <Dialog {...props} />
+    return <Drawer {...props} />
 }

@@ -5,6 +5,7 @@ import { CiEdit, CiReceipt } from "react-icons/ci"
 
 import { ExpenseWithSplits } from "@/app/group/[group_id]/(tabs)/expenses/page"
 import { Member, NewExpenseButton } from "@/app/group/[group_id]/components/new-expense-button"
+import { getDevice } from "@/app/utils/device/device.server"
 import { formattedNumber } from "@/app/utils/words"
 import { Button } from "@/components/ui/button"
 import {
@@ -24,6 +25,7 @@ interface ExpenseCardProps {
 
 export async function ExpenseCard({ expense, members }: ExpenseCardProps) {
     const { userId } = await auth()
+    const device = await getDevice()
     const isPaidByMe = userId === expense.created_by
     const paidBy = members.find((member) => member.id === expense.created_by)?.name
 
@@ -52,6 +54,7 @@ export async function ExpenseCard({ expense, members }: ExpenseCardProps) {
                     </p>
                 </div>
                 <NewExpenseButton
+                    device={device}
                     expense={expense}
                     groupId={expense.group_id}
                     members={members}
