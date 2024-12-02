@@ -9,6 +9,22 @@ export default function manifest(): MetadataRoute.Manifest {
         display: "standalone",
         background_color: "#ffffff",
         theme_color: "#ffffff",
+        share_target: {
+            action: "/",
+            method: "POST",
+            enctype: "multipart/form-data",
+            params: {
+                title: "title",
+                text: "text",
+                url: "url",
+                files: [
+                    {
+                        name: "file",
+                        accept: ["image/*"],
+                    },
+                ],
+            },
+        },
         icons: [
             {
                 src: "/icon-192x192.png",

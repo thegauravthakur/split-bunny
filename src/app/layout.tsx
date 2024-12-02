@@ -18,6 +18,7 @@ export default function RootLayout({ children }: LayoutProps) {
             <html lang="en">
                 <head>
                     <title>Split Bunny</title>
+                    <meta content="#ffffff" name="theme-color" />
                     <link
                         href="/splash_screens/iPhone_16_Pro_Max_landscape.png"
                         media="screen and (device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
