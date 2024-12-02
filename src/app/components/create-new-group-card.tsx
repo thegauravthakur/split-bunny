@@ -1,5 +1,5 @@
 import { createGroupAction } from "@/app/action"
-import { DialogBottomSheet } from "@/app/components/dialog-bottom-sheet"
+import { DialogBottomSheet } from "@/app/components/dialog-bottom-sheet/dialog-bottom-sheet"
 import { PlainCard } from "@/app/components/plain-cart"
 import { ClientForm, ClientFormButton } from "@/components/helpers/client-form"
 import { Button } from "@/components/ui/button"

@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs"
 import type { Metadata } from "next"
 
 import { Header } from "@/app/components/header"
+import { Providers } from "@/app/components/providers/providers"
 import { Toaster } from "@/components/ui/sonner"
 import { LayoutProps } from "@/types/common"
 
@@ -233,9 +234,11 @@ export default function RootLayout({ children }: LayoutProps) {
                     <meta content="yes" name="mobile-web-app-capable" />
                 </head>
                 <body className="min-h-dvh flex flex-col">
-                    <Header />
-                    {children}
-                    <Toaster />
+                    <Providers>
+                        <Header />
+                        {children}
+                        <Toaster />
+                    </Providers>
                 </body>
             </html>
         </ClerkProvider>

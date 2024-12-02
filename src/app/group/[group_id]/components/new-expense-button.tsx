@@ -3,7 +3,7 @@
 import React, { ReactNode, useEffect, useState } from "react"
 import { LiaRupeeSignSolid } from "react-icons/lia"
 
-import { DialogBottomSheet } from "@/app/components/dialog-bottom-sheet"
+import { DialogBottomSheet } from "@/app/components/dialog-bottom-sheet/dialog-bottom-sheet"
 import { ExpenseWithSplits } from "@/app/group/[group_id]/(tabs)/expenses/page"
 import { createExpenseAction } from "@/app/group/[group_id]/action"
 import {
