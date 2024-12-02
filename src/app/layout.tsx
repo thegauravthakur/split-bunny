@@ -228,6 +228,8 @@ export default function RootLayout({ children }: LayoutProps) {
                         media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
                         rel="apple-touch-startup-image"
                     />
+                    <meta content="yes" name="apple-mobile-web-app-capable" />
+                    <meta content="yes" name="mobile-web-app-capable" />
                 </head>
                 <body className="min-h-dvh flex flex-col">
                     <Header />
