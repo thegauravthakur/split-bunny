@@ -4,9 +4,16 @@ import { Drawer as _Drawer } from "vaul"
 import { DialogBottomSheetProps } from "@/app/components/dialog-bottom-sheet/dialog-bottom-sheet"
 import { Button } from "@/components/ui/button"
 
-export function Drawer({ title, description, body, trigger }: DialogBottomSheetProps) {
+export function Drawer({
+    title,
+    description,
+    body,
+    trigger,
+    open,
+    setOpen,
+}: DialogBottomSheetProps) {
     return (
-        <_Drawer.Root>
+        <_Drawer.Root open={open} onOpenChange={setOpen}>
             <_Drawer.Trigger asChild>{trigger}</_Drawer.Trigger>
             <_Drawer.Portal>
                 <_Drawer.Overlay className="fixed inset-0 bg-black/40" />

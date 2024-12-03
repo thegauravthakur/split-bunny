@@ -110,6 +110,7 @@ export function NewExpenseButton({
                                             <Label>Amount</Label>
                                             <Input
                                                 required
+                                                selectAllOnFocus
                                                 className="mt-2"
                                                 placeholder="Enter amount"
                                                 startIcon={LiaRupeeSignSolid}

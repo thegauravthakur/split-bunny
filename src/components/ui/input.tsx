@@ -6,10 +6,11 @@ import { cn } from "@/lib/utils"
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     startIcon?: ComponentType<SVGProps<SVGSVGElement>>
     endIcon?: ComponentType<SVGProps<SVGSVGElement>>
+    selectAllOnFocus?: boolean
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-    ({ className, type, startIcon, endIcon, ...props }, ref) => {
+    ({ className, type, startIcon, endIcon, selectAllOnFocus, ...props }, ref) => {
         const StartIcon = startIcon
         const EndIcon = endIcon
 
@@ -29,6 +30,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         className,
                     )}
                     type={type}
+                    onFocus={(e) => {
+                        if (selectAllOnFocus) {
+                            e.target.select()
+                        }
+                        props.onFocus?.(e)
+                    }}
                     {...props}
                 />
                 {EndIcon && (
