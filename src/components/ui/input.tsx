@@ -30,12 +30,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         className,
                     )}
                     type={type}
-                    onFocus={(e) => {
-                        if (selectAllOnFocus) {
-                            e.target.select()
-                        }
-                        props.onFocus?.(e)
-                    }}
                     {...props}
                 />
                 {EndIcon && (
