@@ -3,10 +3,10 @@ import { notFound } from "next/navigation"
 
 import { ExpenseWithSplits } from "@/app/group/[group_id]/(tabs)/expenses/page"
 import { calculateUserBalance } from "@/app/group/[group_id]/(tabs)/expenses/utls"
+import { AddNewMemberCard } from "@/app/group/[group_id]/(tabs)/members/components/add-new-member-card"
+import { MemberCard } from "@/app/group/[group_id]/(tabs)/members/components/member-card"
 import { getUserDetails } from "@/app/group/[group_id]/(tabs)/utils"
-import { formattedNumber } from "@/app/utils/words"
 import prisma from "@/lib/prisma"
-import { cn } from "@/lib/utils"
 
 interface PageProps {
     params: Promise<{ group_id: string }>
@@ -47,45 +47,17 @@ export default async function Page({ params }: PageProps) {
     }))
 
     return (
-        <ul className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-10">
-            {members.map((member) => (
-                <li key={member.name}>
-                    <MemberCard member={member} />
+        <div>
+            <ul className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-10">
+                {members.map((member) => (
+                    <li key={member.name}>
+                        <MemberCard member={member} />
+                    </li>
+                ))}
+                <li>
+                    <AddNewMemberCard />
                 </li>
-            ))}
-        </ul>
-    )
-}
-
-interface MemberWithBalance {
-    name: string | null
-    profile: string
-    totalSpent: number
-    balance: number
-}
-
-interface MemberCardProps {
-    member: MemberWithBalance
-}
-
-function MemberCard({ member }: MemberCardProps) {
-    return (
-        <div className="flex items-center gap-x-4 border shadow-sm p-3 rounded-lg">
-            <img alt={member.name ?? ""} className="w-12 h-12 rounded-full" src={member.profile} />
-            <div className="flex-1">
-                <h6 className="font-semibold">{member.name}</h6>
-                <p className="text-sm text-muted-foreground">
-                    Spend: {formattedNumber(member.totalSpent)}
-                </p>
-            </div>
-            <p
-                className={cn(
-                    "text-sm font-semibold",
-                    member.balance > 0 ? "text-green-700" : "text-red-600",
-                )}
-            >
-                {formattedNumber(member.balance)}
-            </p>
+            </ul>
         </div>
     )
 }

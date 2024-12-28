@@ -1,6 +1,6 @@
 "use client"
 import dynamic from "next/dynamic"
-import { ReactNode } from "react"
+import { createContext, ReactNode, useState } from "react"
 
 const Drawer = dynamic(
     () => import("@/app/components/dialog-bottom-sheet/drawer").then((m) => m.Drawer),
@@ -24,7 +24,29 @@ export interface DialogBottomSheetProps {
     setOpen?: (open: boolean) => void
 }
 
+export const DialogBottomSheetContext = createContext({
+    open: false,
+    setOpen: (_open: boolean) => {},
+})
+
 export function DialogBottomSheet(props: DialogBottomSheetProps) {
-    if (props.device === "desktop") return <Dialog {...props} />
-    return <Drawer {...props} />
+    const [_open, setOpen] = useState(false)
+    const open = props.open ?? _open
+
+    function handleOpen(open: boolean) {
+        setOpen(open)
+        if (props.setOpen) props.setOpen(open)
+    }
+
+    if (props.device === "desktop")
+        return (
+            <DialogBottomSheetContext.Provider value={{ open, setOpen }}>
+                <Dialog open={open} setOpen={handleOpen} {...props} />
+            </DialogBottomSheetContext.Provider>
+        )
+    return (
+        <DialogBottomSheetContext.Provider value={{ open, setOpen }}>
+            <Drawer open={open} setOpen={handleOpen} {...props} />
+        </DialogBottomSheetContext.Provider>
+    )
 }

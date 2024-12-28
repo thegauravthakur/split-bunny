@@ -1,13 +1,15 @@
 "use client"
-import { HTMLProps } from "react"
-import { useFormStatus } from "react-dom"
-import { toast } from "sonner"
-import { PiSpinner } from "react-icons/pi"
-import { cn } from "@/lib/utils"
-import { Button, ButtonProps } from "@/components/ui/button"
 import { Result } from "neverthrow"
-import { parseResultInterfaceFromObject } from "@/app/utils/result"
 import Form from "next/form"
+import { HTMLProps, useContext } from "react"
+import { useFormStatus } from "react-dom"
+import { PiSpinner } from "react-icons/pi"
+import { toast } from "sonner"
+
+import { DialogBottomSheetContext } from "@/app/components/dialog-bottom-sheet/dialog-bottom-sheet"
+import { parseResultInterfaceFromObject } from "@/app/utils/result"
+import { Button, ButtonProps } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 interface ClientFormProps extends Omit<HTMLProps<HTMLFormElement>, "action"> {
     action: (formData: FormData) => any
@@ -33,17 +35,17 @@ function handleGenericResponse<T, K>(response: Result<T, K>) {
 }
 
 export function ClientForm<T, K>({ onSubmitSuccess, ...props }: ClientFormProps) {
+    const { setOpen } = useContext(DialogBottomSheetContext)
     return (
         <Form
             {...props}
             action={async (formData) => {
                 const _response = await props.action(formData)
-                console.log(_response)
                 const response = parseResultInterfaceFromObject<T, K>(_response)
-                console.log(response)
                 handleGenericResponse(response)
                 if (response.isOk()) {
                     if (onSubmitSuccess) onSubmitSuccess()
+                    if (props.closeOnSuccess) setOpen(false)
                 }
             }}
         />

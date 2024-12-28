@@ -9,13 +9,14 @@ datasource db {
 }
 
 model Group {
-  id         String    @id @default(uuid())
+  id         String       @id @default(uuid())
   name       String
   image      String
   member_ids String[]
   Expense    Expense[]
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+  Invitation Invitation[]
 }
 
 model Expense {
@@ -47,4 +48,15 @@ model Split {
   expense_id String
   expense    Expense  @relation(fields: [expense_id], references: [id])
   created_at DateTime @default(now())
+}
+
+model Invitation {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  name        String
+  // A placeholder for the user-id until we have a user logged in properly
+  placeholder String   @unique @default(uuid())
+  group_id    String
+  group       Group    @relation(fields: [group_id], references: [id])
+  created_at  DateTime @default(now())
 }
