@@ -6,7 +6,7 @@ on:
 
 jobs:
   print_payload:
-    runs-on: qa-arc-runner-set
+    runs-on: ubuntu-latest
     steps:
       - name: Print Webhook Payload
         run: |
