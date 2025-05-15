@@ -1,0 +1,14 @@
+name: Lighthouse Report
+
+on:
+  repository_dispatch:
+    types: [payload-received]
+
+jobs:
+  print_payload:
+    runs-on: qa-arc-runner-set
+    steps:
+      - name: Print Webhook Payload
+        run: |
+          echo "Received webhook payload:"
+          echo "${{ toJson(github.event.client_payload) }}"
