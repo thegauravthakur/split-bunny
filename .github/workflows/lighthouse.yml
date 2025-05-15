@@ -2,7 +2,7 @@ name: Lighthouse Report
 
 on:
   repository_dispatch:
-    types: [payload-received]
+    types: [generate-lighthouse-report]
 
 jobs:
   print_payload:
