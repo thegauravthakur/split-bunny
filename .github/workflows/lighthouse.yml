@@ -11,4 +11,4 @@ jobs:
       - name: Print Webhook Payload
         run: |
           echo "Received webhook payload:"
-          echo "${{ github.event.client_payload }}"
+          echo "${{ fromJson(github.event.client_payload) }}"
