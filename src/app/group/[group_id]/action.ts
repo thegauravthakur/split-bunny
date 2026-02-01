@@ -23,7 +23,9 @@ async function validateSplitConfig(splitConfig: string, expense: CreateExpenseSc
         })
         const totalSplitAmount = parsedSplitConfig.reduce((acc, split) => acc + split.amount, 0)
 
-        if (totalSplitAmount !== expense.amount)
+        // Use tolerance for floating point comparison (e.g., 100/3 * 3 !== 100)
+        const tolerance = 0.01
+        if (Math.abs(totalSplitAmount - expense.amount) > tolerance)
             return err(["The total amount of splits does not match the expense amount."])
 
         if (!group) return err(["Group not found."])
@@ -150,4 +152,37 @@ export async function createExpenseAction(formData: FormData) {
     revalidatePath("/")
     revalidatePath(`/group/${expenseBody.group_id}`)
     return createParsableResultInterface(ok(["Expense created successfully"]))
+}
+
+export async function deleteExpenseAction(
+    expenseId: string,
+    groupId: string,
+): Promise<ReturnType<typeof createParsableResultInterface>> {
+    try {
+        const _auth = await auth()
+        const userId = _auth.userId ?? undefined
+        if (!userId) return createParsableResultInterface(err(["You must be logged in."]))
+
+        // Verify user is member of the group
+        const group = await prisma.group.findUnique({
+            where: { id: groupId, member_ids: { has: userId } },
+        })
+        if (!group) return createParsableResultInterface(err(["Group not found."]))
+
+        // Verify expense exists and belongs to the group
+        const expense = await prisma.expense.findUnique({
+            where: { id: expenseId, group_id: groupId },
+        })
+        if (!expense) return createParsableResultInterface(err(["Expense not found."]))
+
+        // Delete associated splits first, then the expense
+        await prisma.split.deleteMany({ where: { expense_id: expenseId } })
+        await prisma.expense.delete({ where: { id: expenseId } })
+
+        revalidatePath("/")
+        revalidatePath(`/group/${groupId}`)
+        return createParsableResultInterface(ok(["Expense deleted successfully"]))
+    } catch (_error) {
+        return createParsableResultInterface(err(["Failed to delete expense."]))
+    }
 }

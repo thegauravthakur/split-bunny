@@ -42,6 +42,14 @@ interface NewExpenseButtonProps {
     userId: string
 }
 
+function getInitialPeople(members: Member[], expense?: ExpenseWithSplits): People[] {
+    if (!expense) return members.map((member) => ({ ...member, isChecked: true }))
+    return members.map((member) => ({
+        ...member,
+        isChecked: expense.splits.some((s) => s.user_id === member.id),
+    }))
+}
+
 export function NewExpenseButton({
     groupId,
     expense,
@@ -50,18 +58,26 @@ export function NewExpenseButton({
     device,
     userId,
 }: NewExpenseButtonProps) {
-    const isDesktop = useMediaQuery("(min-width: 768px)")
+    // Use server-provided device as initial value to avoid hydration mismatch
+    const isDesktop = useMediaQuery("(min-width: 768px)", {
+        defaultValue: device === "desktop",
+        initializeWithValue: false,
+    })
     const [isOpen, setIsOpen] = useState(false)
     const [amount, setAmount] = useState(expense?.amount ?? 0)
-    const [people, setPeople] = useState<People[]>(() => {
-        if (!expense) return members.map((member) => ({ ...member, isChecked: true }))
-        return members.map((member) => ({
-            ...member,
-            isChecked: expense.splits.some((s) => s.user_id === member.id),
-        }))
-    })
+    const [people, setPeople] = useState<People[]>(() => getInitialPeople(members, expense))
     const splitConfig = createSplitConfig(people, amount)
     const isUpdateOperation = Boolean(expense)
+    const hasParticipants = people.some((p) => p.isChecked)
+
+    // Reset form state when modal opens
+    function handleOpenChange(open: boolean) {
+        if (open) {
+            setAmount(expense?.amount ?? 0)
+            setPeople(getInitialPeople(members, expense))
+        }
+        setIsOpen(open)
+    }
 
     return (
         <DialogBottomSheet
@@ -85,7 +101,7 @@ export function NewExpenseButton({
                     <div className="flex items-center gap-x-2">
                         <Label htmlFor="expense-amount">Amount </Label>
                         <div className="flex items-center gap-x-2 text-sm flex-1">
-                            <Select defaultValue={userId ?? members[0]?.id} name="paid_by">
+                            <Select defaultValue={expense?.paid_by ?? userId ?? members[0]?.id} name="paid_by">
                                 <SelectTrigger className="[&_svg]:hidden bg-secondary text-xs px-3 h-8 w-max font-medium shadow-none border-transparent">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -184,7 +200,9 @@ export function NewExpenseButton({
                             <input name="id" type="hidden" value={expense?.id} />
                         </>
                     ) : null}
-                    <ClientFormButton className="mt-6">Create Expense</ClientFormButton>
+                    <ClientFormButton className="mt-6" disabled={!hasParticipants}>
+                        {isUpdateOperation ? "Update Expense" : "Create Expense"}
+                    </ClientFormButton>
                 </ClientForm>
             }
             description={
@@ -194,8 +212,8 @@ export function NewExpenseButton({
             }
             device={device}
             open={isOpen}
-            setOpen={setIsOpen}
-            title={isUpdateOperation ? `Edit Expense` : "Create a new expense"}
+            setOpen={handleOpenChange}
+            title={isUpdateOperation ? "Edit Expense" : "Create a new expense"}
             trigger={children}
         />
     )

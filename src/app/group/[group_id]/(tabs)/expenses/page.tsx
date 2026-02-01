@@ -53,7 +53,7 @@ export default async function Page({ params }: PageProps) {
     const expensesByMonth = getExpensesByMonth(expenses)
 
     return (
-        <main className="">
+        <main>
             {expenses.length === 0 ? (
                 <div className="flex flex-col items-center justify-center gap-2 mt-6">
                     <h4 className="font-semibold">No Expenses</h4>
@@ -74,19 +74,20 @@ export default async function Page({ params }: PageProps) {
                         </NewExpenseButton>
                     </span>
                 </div>
-            ) : null}
-            {Object.keys(expensesByMonth).map((month) => (
-                <div key={month} className="mt-6 text-sm">
-                    <h4 className="font-semibold">{month}</h4>
-                    <ul className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
-                        {expensesByMonth[month].map((expense) => (
-                            <li key={expense.id} className="">
-                                <ExpenseCard expense={expense} members={members} />
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            ))}
+            ) : (
+                Object.keys(expensesByMonth).map((month) => (
+                    <div key={month} className="my-6 text-sm">
+                        <h4 className="font-semibold">{month}</h4>
+                        <ul className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+                            {expensesByMonth[month].map((expense) => (
+                                <li key={expense.id}>
+                                    <ExpenseCard expense={expense} members={members} />
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ))
+            )}
         </main>
     )
 }
