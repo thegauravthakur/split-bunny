@@ -1,5 +1,6 @@
 import React from "react"
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Checkbox } from "@/components/ui/checkbox"
 
 interface SplitEquallySectionProps {
@@ -70,7 +71,9 @@ export function SplitEquallySection({
                                 checked={person.isChecked}
                                 onCheckedChange={(checked) => {
                                     const newPeople = [...people]
-                                    const targetIndex = newPeople.findIndex((p) => p.id === person.id)
+                                    const targetIndex = newPeople.findIndex(
+                                        (p) => p.id === person.id,
+                                    )
                                     if (targetIndex === -1) return
                                     newPeople[targetIndex] = {
                                         ...person,
@@ -91,7 +94,8 @@ export function SplitEquallySection({
                 <p className="text-sm mt-4 flex flex-col items-center border-t pt-4">
                     <span>₹{displayAmount.toFixed(2)}/person</span>
                     <span className="text-xs text-muted-foreground">
-                        ({selectedPeople.length} {selectedPeople.length === 1 ? "person" : "people"})
+                        ({selectedPeople.length} {selectedPeople.length === 1 ? "person" : "people"}
+                        )
                     </span>
                 </p>
             ) : null}
