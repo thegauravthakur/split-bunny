@@ -13,13 +13,15 @@ interface PageProps {
 }
 
 function getTotalAmountSpendByUser(userId: string, expenses: ExpenseWithSplits[]) {
-    return expenses.reduce((acc, expense) => {
-        const expenseSpend = expense.splits.reduce((acc, split) => {
-            if (split.user_id === userId) return acc + split.amount
-            return acc
+    const total = expenses.reduce((totalAcc, expense) => {
+        const expenseSpend = expense.splits.reduce((splitAcc, split) => {
+            if (split.user_id === userId) return splitAcc + split.amount
+            return splitAcc
         }, 0)
-        return acc + expenseSpend
+        return totalAcc + expenseSpend
     }, 0)
+    // Round to 2 decimal places to avoid floating-point accumulation errors
+    return Math.round(total * 100) / 100
 }
 
 export default async function Page({ params }: PageProps) {

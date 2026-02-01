@@ -10,5 +10,6 @@ export function calculateUserBalance(userId: string, expenses: ExpenseWithSplits
         totalBalance += userPaid - userOwes
     }
 
-    return totalBalance
+    // Round to 2 decimal places to avoid floating-point accumulation errors
+    return Math.round(totalBalance * 100) / 100
 }

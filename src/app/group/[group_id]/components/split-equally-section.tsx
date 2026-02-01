@@ -47,10 +47,11 @@ export function SplitEquallySection({
     const splitConfig = createSplitConfig(people, amount)
 
     // Get the per-person amounts from the actual split config for accurate display
+    // Show the minimum (base) amount since most participants pay this amount
     const perPersonAmounts = splitConfig.map((s) => s.amount)
     const displayAmount =
         perPersonAmounts.length > 0
-            ? perPersonAmounts[0] // Show the base amount (first person might have +1 paise)
+            ? Math.min(...perPersonAmounts) // Show the base amount (some may pay +1 paise for remainder)
             : 0
 
     return (

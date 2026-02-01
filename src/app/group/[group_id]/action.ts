@@ -17,28 +17,36 @@ function getGroupDetails(groupId: string, userId: string): Promise<Group | null>
 
 async function validateSplitConfig(splitConfig: string, expense: CreateExpenseSchemaType) {
     try {
-        const parsedSplitConfig = JSON.parse(splitConfig) as { user_id: string; amount: number }[]
-        const group = await prisma.group.findUnique({
-            where: { id: expense.group_id },
-        })
-        const totalSplitAmount = parsedSplitConfig.reduce((acc, split) => acc + split.amount, 0)
+        const parsedSplitConfig = JSON.parse(splitConfig)
 
-        // Use tolerance for floating point comparison (e.g., 100/3 * 3 !== 100)
-        const tolerance = 0.01
-        if (Math.abs(totalSplitAmount - expense.amount) > tolerance)
-            return err(["The total amount of splits does not match the expense amount."])
-
-        if (!group) return err(["Group not found."])
-
+        // Validate array structure first, before using array methods
         if (!Array.isArray(parsedSplitConfig))
             return err(["Please provide a valid split configuration."])
         if (parsedSplitConfig.length === 0)
             return err(["Please choose at least one person to split the expense"])
+
+        const group = await prisma.group.findUnique({
+            where: { id: expense.group_id },
+        })
+        if (!group) return err(["Group not found."])
+
+        // Validate each split entry
         for (const split of parsedSplitConfig) {
             if (!split.user_id) return err(["Please provide a valid user ID."])
             if (!group.member_ids.includes(split.user_id)) return err(["User not found."])
-            if (split.amount <= 0) return err(["Please provide a valid amount."])
+            if (typeof split.amount !== "number" || split.amount <= 0)
+                return err(["Please provide a valid amount."])
         }
+
+        // Use tolerance for floating point comparison (e.g., 100/3 * 3 !== 100)
+        const totalSplitAmount = parsedSplitConfig.reduce(
+            (acc: number, split: { amount: number }) => acc + split.amount,
+            0,
+        )
+        const tolerance = 0.01
+        if (Math.abs(totalSplitAmount - expense.amount) > tolerance)
+            return err(["The total amount of splits does not match the expense amount."])
+
         return ok(true)
     } catch (_error) {
         return err(["An error occurred while validating the split configuration."])
@@ -73,6 +81,10 @@ async function createExpense(expense: CreateExpenseSchemaType): Promise<Result<E
 
         // If expenseId is present, it means we are updating an existing expense
         if (expense.id) {
+            // Verify user is a member of the group before allowing update
+            const group = await getGroupDetails(expense.group_id, userId)
+            if (!group) return err(["You must be a member of the group to update an expense."])
+
             const existingExpense = await prisma.expense.findUnique({
                 where: { id: expense.id, group_id: expense.group_id },
             })
@@ -84,7 +96,7 @@ async function createExpense(expense: CreateExpenseSchemaType): Promise<Result<E
                     name: expense.name,
                     amount: expense.amount,
                     description: expense.description,
-                    created_by: userId,
+                    // Note: created_by is intentionally not updated to preserve audit trail
                     group_id: expense.group_id,
                     paid_by: expense.paid_by,
                     splits: {
