@@ -17,7 +17,7 @@ export async function Header() {
     const initials = name?.map((name) => name[0]).join("")
 
     return (
-        <header className="flex items-center justify-between border-b px-2 md:px-4 text-sm h-12 md:h-14 shadow-sm">
+        <header className="flex items-center justify-between border-b px-2 md:px-4 text-sm h-12 md:h-14 shadow-xs">
             <h1 className="font-bold text-base md:text-lg flex items-center gap-2">
                 <MdOutlineCallSplit className="size-5 md:size-6" />
                 <Link href={"/"}>Split Bunny</Link>

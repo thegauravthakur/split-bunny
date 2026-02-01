@@ -32,7 +32,7 @@ export async function ExpenseCard({ expense, members }: ExpenseCardProps) {
     return (
         <Drawer>
             <div
-                className={cn("rounded-xl border p-4 shadow-sm flex items-center gap-x-2 relative")}
+                className={cn("rounded-xl border p-4 shadow-xs flex items-center gap-x-2 relative")}
             >
                 <DrawerTrigger asChild>
                     <Button

@@ -14,7 +14,7 @@ interface MemberCardProps {
 
 export function MemberCard({ member }: MemberCardProps) {
     return (
-        <div className="flex items-center gap-x-4 border shadow-sm p-3 rounded-lg">
+        <div className="flex items-center gap-x-4 border shadow-xs p-3 rounded-lg">
             <img alt={member.name ?? ""} className="w-12 h-12 rounded-full" src={member.profile} />
             <div className="flex-1">
                 <h6 className="font-semibold">{member.name}</h6>

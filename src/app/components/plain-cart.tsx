@@ -13,7 +13,7 @@ interface PlainCardProps {
  */
 export function PlainCard({ title, description, triggerElement }: PlainCardProps) {
     return (
-        <div className="border rounded-md shadow-sm p-4 flex flex-col justify-between gap-y-4 relative items-start text-base font-normal w-full">
+        <div className="border rounded-md shadow-xs p-4 flex flex-col justify-between gap-y-4 relative items-start text-base font-normal w-full">
             {triggerElement ? (
                 <Button
                     asChild

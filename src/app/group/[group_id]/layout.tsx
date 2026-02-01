@@ -31,7 +31,7 @@ export default async function Layout({ params, children }: LayoutProps) {
     const members = trimMembersDetails(userDetails)
 
     return (
-        <div className="max-w-screen-xl mx-auto w-full mb-10">
+        <div className="max-w-(--breakpoint-xl) mx-auto w-full mb-10">
             <header className="border-b py-6 lg:py-6 px-2 md:px-6 lg:px-10">
                 <div className="flex items-center gap-x-4">
                     <Avatar className="size-14 md:size-16">

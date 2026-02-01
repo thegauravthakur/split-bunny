@@ -29,7 +29,7 @@ export async function AddNewMemberCard() {
             device={device}
             title="Add a new member"
             trigger={
-                <button className="border shadow-sm p-3 rounded-lg border-primary text-left w-full">
+                <button className="border shadow-xs p-3 rounded-lg border-primary text-left w-full">
                     <div className="h-12 flex flex-col">
                         <span className="font-semibold">Add New Member</span>
                         <span className="text-muted-foreground text-sm">
