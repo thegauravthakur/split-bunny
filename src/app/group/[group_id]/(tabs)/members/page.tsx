@@ -28,6 +28,7 @@ export default async function Page({ params }: PageProps) {
     const { userId } = await auth()
     const group = await prisma.group.findUnique({
         where: { id: group_id, member_ids: { has: userId } },
+        include: { Invitation: true },
     })
 
     if (!group) notFound()
@@ -37,25 +38,57 @@ export default async function Page({ params }: PageProps) {
         include: { splits: true },
     })
 
-    const userDetails = await getUserDetails(...group.member_ids)
+    // Get Clerk users for real user IDs
+    const clerkUsers = await getUserDetails(...group.member_ids)
+    const clerkUserIds = new Set(clerkUsers.map((u) => u.id))
 
-    const members = userDetails.map((user) => ({
-        name: user.id === userId ? "You" : user.fullName,
+    // Find placeholder IDs (invited members not yet in Clerk)
+    const placeholderIds = group.member_ids.filter((id) => !clerkUserIds.has(id))
+
+    // Map invitations by placeholder ID for quick lookup
+    const invitationsByPlaceholder = new Map(
+        group.Invitation.map((inv) => [inv.placeholder, inv])
+    )
+
+    // Build member list from Clerk users
+    const clerkMembers = clerkUsers.map((user) => ({
+        id: user.id,
+        name: user.id === userId ? "You" : user.fullName ?? user.primaryEmailAddress?.emailAddress ?? "Unknown",
         profile: user.imageUrl,
         totalSpent: getTotalAmountSpendByUser(user.id, expenses),
         balance: calculateUserBalance(user.id, expenses),
+        isInvited: false,
     }))
+
+    // Build member list from invitations (placeholder IDs)
+    const invitedMembers = placeholderIds
+        .map((placeholderId) => {
+            const invitation = invitationsByPlaceholder.get(placeholderId)
+            if (!invitation) return null
+            return {
+                id: placeholderId,
+                name: invitation.name,
+                profile: null as string | null,
+                totalSpent: getTotalAmountSpendByUser(placeholderId, expenses),
+                balance: calculateUserBalance(placeholderId, expenses),
+                isInvited: true as const,
+                email: invitation.email,
+            }
+        })
+        .filter((m): m is NonNullable<typeof m> => m !== null)
+
+    const members = [...clerkMembers, ...invitedMembers]
 
     return (
         <div>
             <ul className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-10">
                 {members.map((member) => (
-                    <li key={member.name}>
+                    <li key={member.id}>
                         <MemberCard member={member} />
                     </li>
                 ))}
                 <li>
-                    <AddNewMemberCard />
+                    <AddNewMemberCard groupId={group_id} />
                 </li>
             </ul>
         </div>

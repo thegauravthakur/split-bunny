@@ -7,7 +7,7 @@ import { IoIosAdd } from "react-icons/io"
 
 import { getUserDetails, trimMembersDetails } from "@/app/group/[group_id]/(tabs)/utils"
 import { ExpenseCard } from "@/app/group/[group_id]/components/expense-cart"
-import { NewExpenseButton } from "@/app/group/[group_id]/components/new-expense-button"
+import { Member, NewExpenseButton } from "@/app/group/[group_id]/components/new-expense-button"
 import { getDevice } from "@/app/utils/device/device.server"
 import { Button } from "@/components/ui/button"
 import prisma from "@/lib/prisma"
@@ -37,6 +37,7 @@ export default async function Page({ params }: PageProps) {
     const { userId } = await auth()
     const group = await prisma.group.findUnique({
         where: { id: group_id, member_ids: { has: userId } },
+        include: { Invitation: true },
     })
 
     if (!group) notFound()
@@ -47,8 +48,33 @@ export default async function Page({ params }: PageProps) {
         include: { splits: true },
     })
 
-    const userDetails = await getUserDetails(...group.member_ids)
-    const members = trimMembersDetails(userDetails)
+    // Get Clerk users for real user IDs
+    const clerkUsers = await getUserDetails(...group.member_ids)
+    const clerkMembers = trimMembersDetails(clerkUsers)
+    const clerkUserIds = new Set(clerkUsers.map((u) => u.id))
+
+    // Find placeholder IDs (invited members not yet in Clerk)
+    const placeholderIds = group.member_ids.filter((id) => !clerkUserIds.has(id))
+
+    // Map invitations by placeholder ID
+    const invitationsByPlaceholder = new Map(
+        group.Invitation.map((inv) => [inv.placeholder, inv])
+    )
+
+    // Build invited members list
+    const invitedMembers: Member[] = placeholderIds
+        .map((placeholderId) => {
+            const invitation = invitationsByPlaceholder.get(placeholderId)
+            if (!invitation) return null
+            return {
+                id: placeholderId,
+                name: invitation.name,
+                image: "", // Empty image for invited members
+            }
+        })
+        .filter((m): m is Member => m !== null)
+
+    const members = [...clerkMembers, ...invitedMembers]
 
     const expensesByMonth = getExpensesByMonth(expenses)
 

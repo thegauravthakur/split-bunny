@@ -5,7 +5,11 @@ import { ClientForm, ClientFormButton } from "@/components/helpers/client-form"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-export async function AddNewMemberCard() {
+interface AddNewMemberCardProps {
+    groupId: string
+}
+
+export async function AddNewMemberCard({ groupId }: AddNewMemberCardProps) {
     const device = await getDevice()
     return (
         <DialogBottomSheet
@@ -22,6 +26,7 @@ export async function AddNewMemberCard() {
                         placeholder="rohan@gmail.com"
                         type="email"
                     />
+                    <input type="hidden" name="group_id" value={groupId} />
                     <ClientFormButton className="mt-6">Add New Member</ClientFormButton>
                 </ClientForm>
             }
