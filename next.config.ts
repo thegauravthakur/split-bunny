@@ -4,9 +4,6 @@ import type { NextConfig } from "next"
 // const withBundleAnalyzer = BundleAnalyzer()
 
 const nextConfig: NextConfig = {
-    eslint: {
-        ignoreDuringBuilds: true,
-    },
     async redirects() {
         return [
             {
