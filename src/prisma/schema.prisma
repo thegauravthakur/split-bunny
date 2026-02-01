@@ -53,11 +53,14 @@ model Split {
 
 model Invitation {
   id          String   @id @default(uuid())
-  email       String   @unique
+  email       String
   name        String
   // A placeholder for the user-id until we have a user logged in properly
   placeholder String   @unique @default(uuid())
   group_id    String
   group       Group    @relation(fields: [group_id], references: [id])
   created_at  DateTime @default(now())
+
+  // Same email can be invited to multiple groups, but only once per group
+  @@unique([email, group_id])
 }
