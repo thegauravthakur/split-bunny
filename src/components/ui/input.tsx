@@ -10,12 +10,15 @@ interface InputProps extends React.ComponentProps<"input"> {
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, startIcon: StartIcon, selectAllOnFocus, onFocus, ...props }, ref) => {
-    const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-      if (selectAllOnFocus) {
-        e.target.select()
-      }
-      onFocus?.(e)
-    }
+    // Only create handler if needed - avoids serialization issues in Server Components
+    const handleFocus = (selectAllOnFocus || onFocus)
+      ? (e: React.FocusEvent<HTMLInputElement>) => {
+          if (selectAllOnFocus) {
+            e.target.select()
+          }
+          onFocus?.(e)
+        }
+      : undefined
 
     if (StartIcon) {
       return (
@@ -28,7 +31,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               className
             )}
             ref={ref}
-            onFocus={handleFocus}
+            {...(handleFocus && { onFocus: handleFocus })}
             {...props}
           />
         </div>
@@ -43,7 +46,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           className
         )}
         ref={ref}
-        onFocus={handleFocus}
+        {...(handleFocus && { onFocus: handleFocus })}
         {...props}
       />
     )
