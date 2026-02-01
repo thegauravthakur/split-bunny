@@ -44,6 +44,7 @@ enum SplitType {
 model Split {
   id         String   @id @default(uuid())
   amount     Float
+  percentage Float?   // Only populated for PERCENTAGE split type
   user_id    String
   expense_id String
   expense    Expense  @relation(fields: [expense_id], references: [id])

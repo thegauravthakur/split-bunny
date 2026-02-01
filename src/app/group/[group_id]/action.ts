@@ -69,6 +69,7 @@ async function createExpense(expense: CreateExpenseSchemaType): Promise<Result<E
             id: string
             user_id: string
             amount: number
+            percentage?: number
         }[]
 
         // If expenseId is present, it means we are updating an existing expense
@@ -86,10 +87,15 @@ async function createExpense(expense: CreateExpenseSchemaType): Promise<Result<E
                     description: expense.description,
                     created_by: userId,
                     group_id: expense.group_id,
+                    type: expense.split_type,
                     paid_by: expense.paid_by,
                     splits: {
                         deleteMany: { expense_id: expense.id },
-                        create: splitConfig.map((s) => ({ user_id: s.user_id, amount: s.amount })),
+                        create: splitConfig.map((s) => ({
+                            user_id: s.user_id,
+                            amount: s.amount,
+                            percentage: s.percentage ?? null,
+                        })),
                     },
                 },
             })
@@ -106,10 +112,14 @@ async function createExpense(expense: CreateExpenseSchemaType): Promise<Result<E
                 description: expense.description,
                 created_by: userId,
                 group_id: expense.group_id,
-                type: "EQUAL",
+                type: expense.split_type,
                 paid_by: expense.paid_by,
                 splits: {
-                    create: splitConfig.map((s) => ({ user_id: s.user_id, amount: s.amount })),
+                    create: splitConfig.map((s) => ({
+                        user_id: s.user_id,
+                        amount: s.amount,
+                        percentage: s.percentage ?? null,
+                    })),
                 },
             },
         })
@@ -119,6 +129,8 @@ async function createExpense(expense: CreateExpenseSchemaType): Promise<Result<E
         return err(["An error occurred while creating the group. Please try again."])
     }
 }
+
+const splitTypeSchema = z.enum(["EQUAL", "PERCENTAGE", "AMOUNT"])
 
 const createExpenseSchema = z.object({
     name: z
@@ -132,6 +144,7 @@ const createExpenseSchema = z.object({
     group_id: z.string({ message: "Group ID must be a string." }),
     paid_by: z.string(),
     split_config: z.string(),
+    split_type: splitTypeSchema.default("EQUAL"),
     id: z.string().optional(),
 })
 

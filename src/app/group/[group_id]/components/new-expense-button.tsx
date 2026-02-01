@@ -7,6 +7,16 @@ import { DialogBottomSheet } from "@/app/components/dialog-bottom-sheet/dialog-b
 import { ExpenseWithSplits } from "@/app/group/[group_id]/(tabs)/expenses/page"
 import { createExpenseAction } from "@/app/group/[group_id]/action"
 import {
+    createAmountSplitConfig,
+    PersonWithAmount,
+    SplitByAmountSection,
+} from "@/app/group/[group_id]/components/split-by-amount-section"
+import {
+    createPercentageSplitConfig,
+    PersonWithPercentage,
+    SplitByPercentageSection,
+} from "@/app/group/[group_id]/components/split-by-percentage-section"
+import {
     createSplitConfig,
     People,
     SplitEquallySection,
@@ -26,6 +36,8 @@ import {
 } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
+
+export type SplitType = "EQUAL" | "PERCENTAGE" | "AMOUNT"
 
 export interface Member {
     name: string
@@ -50,6 +62,58 @@ function getInitialPeople(members: Member[], expense?: ExpenseWithSplits): Peopl
     }))
 }
 
+function getInitialPercentagePeople(
+    members: Member[],
+    expense?: ExpenseWithSplits
+): PersonWithPercentage[] {
+    if (!expense) {
+        const equalPercentage = members.length > 0 ? 100 / members.length : 0
+        return members.map((member) => ({
+            ...member,
+            isChecked: true,
+            percentage: Number(equalPercentage.toFixed(2)),
+        }))
+    }
+    // For existing expense, use stored percentage if available, otherwise calculate from amount
+    return members.map((member) => {
+        const split = expense.splits.find((s) => s.user_id === member.id)
+        const percentage = split?.percentage
+            ?? (split && expense.amount > 0 ? (split.amount / expense.amount) * 100 : 0)
+        return {
+            ...member,
+            isChecked: Boolean(split),
+            percentage: Number(percentage.toFixed(2)),
+        }
+    })
+}
+
+function getInitialAmountPeople(
+    members: Member[],
+    expense?: ExpenseWithSplits
+): PersonWithAmount[] {
+    if (!expense) {
+        return members.map((member) => ({
+            ...member,
+            isChecked: true,
+            customAmount: 0,
+        }))
+    }
+    return members.map((member) => {
+        const split = expense.splits.find((s) => s.user_id === member.id)
+        return {
+            ...member,
+            isChecked: Boolean(split),
+            customAmount: split?.amount ?? 0,
+        }
+    })
+}
+
+const SPLIT_TYPE_LABELS: Record<SplitType, string> = {
+    EQUAL: "equally",
+    PERCENTAGE: "by %",
+    AMOUNT: "by amount",
+}
+
 export function NewExpenseButton({
     groupId,
     expense,
@@ -65,18 +129,65 @@ export function NewExpenseButton({
     })
     const [isOpen, setIsOpen] = useState(false)
     const [amount, setAmount] = useState(expense?.amount ?? 0)
-    const [people, setPeople] = useState<People[]>(() => getInitialPeople(members, expense))
-    const splitConfig = createSplitConfig(people, amount)
+    const [splitType, setSplitType] = useState<SplitType>(expense?.type ?? "EQUAL")
+
+    // State for each split type
+    const [equalPeople, setEqualPeople] = useState<People[]>(() =>
+        getInitialPeople(members, expense)
+    )
+    const [percentagePeople, setPercentagePeople] = useState<PersonWithPercentage[]>(() =>
+        getInitialPercentagePeople(members, expense)
+    )
+    const [amountPeople, setAmountPeople] = useState<PersonWithAmount[]>(() =>
+        getInitialAmountPeople(members, expense)
+    )
+
+    // Compute the split config based on current split type
+    const splitConfig = (() => {
+        switch (splitType) {
+            case "EQUAL":
+                return createSplitConfig(equalPeople, amount)
+            case "PERCENTAGE":
+                return createPercentageSplitConfig(percentagePeople, amount)
+            case "AMOUNT":
+                return createAmountSplitConfig(amountPeople)
+        }
+    })()
+
+    // Validation for each split type
+    const isValidSplit = (() => {
+        switch (splitType) {
+            case "EQUAL":
+                return equalPeople.some((p) => p.isChecked)
+            case "PERCENTAGE": {
+                const selected = percentagePeople.filter((p) => p.isChecked)
+                const total = selected.reduce((sum, p) => sum + p.percentage, 0)
+                return selected.length > 0 && Math.abs(total - 100) <= 0.01
+            }
+            case "AMOUNT": {
+                const selected = amountPeople.filter((p) => p.isChecked)
+                const allocated = selected.reduce((sum, p) => sum + p.customAmount, 0)
+                return selected.length > 0 && Math.abs(allocated - amount) <= 0.01
+            }
+        }
+    })()
+
     const isUpdateOperation = Boolean(expense)
-    const hasParticipants = people.some((p) => p.isChecked)
 
     // Reset form state when modal opens
     function handleOpenChange(open: boolean) {
         if (open) {
             setAmount(expense?.amount ?? 0)
-            setPeople(getInitialPeople(members, expense))
+            setSplitType(expense?.type ?? "EQUAL")
+            setEqualPeople(getInitialPeople(members, expense))
+            setPercentagePeople(getInitialPercentagePeople(members, expense))
+            setAmountPeople(getInitialAmountPeople(members, expense))
         }
         setIsOpen(open)
+    }
+
+    function handleTabChange(value: string) {
+        setSplitType(value as SplitType)
     }
 
     return (
@@ -117,10 +228,10 @@ export function NewExpenseButton({
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button size="sm" variant="secondary">
-                                        equally
+                                        {SPLIT_TYPE_LABELS[splitType]}
                                     </Button>
                                 </PopoverTrigger>
-                                <PopoverContent>
+                                <PopoverContent className="w-80">
                                     {isDesktop ? (
                                         <>
                                             <Label>Amount</Label>
@@ -136,37 +247,45 @@ export function NewExpenseButton({
                                             />
                                         </>
                                     ) : null}
-                                    <Tabs className="md:mt-4 w-full" defaultValue="account">
+                                    <Tabs
+                                        className="md:mt-4 w-full"
+                                        value={splitType}
+                                        onValueChange={handleTabChange}
+                                    >
                                         <TabsList className="w-full">
-                                            <TabsTrigger className="flex-1" value="account">
+                                            <TabsTrigger className="flex-1" value="EQUAL">
                                                 Equal
                                             </TabsTrigger>
-                                            <TabsTrigger className="flex-1" value="percentage">
+                                            <TabsTrigger className="flex-1" value="PERCENTAGE">
                                                 Percentage
                                             </TabsTrigger>
-                                            <TabsTrigger className="flex-1" value="amount">
+                                            <TabsTrigger className="flex-1" value="AMOUNT">
                                                 Amount
                                             </TabsTrigger>
                                         </TabsList>
-                                        <TabsContent className="mt-4" value="account">
+                                        <TabsContent className="mt-4" value="EQUAL">
                                             <SplitEquallySection
                                                 amount={amount}
-                                                people={people}
-                                                setPeople={setPeople}
+                                                people={equalPeople}
+                                                setPeople={setEqualPeople}
                                                 userId={userId}
                                             />
                                         </TabsContent>
-                                        <TabsContent
-                                            className="text-sm text-muted-foreground text-center"
-                                            value="percentage"
-                                        >
-                                            coming soon
+                                        <TabsContent className="mt-4" value="PERCENTAGE">
+                                            <SplitByPercentageSection
+                                                amount={amount}
+                                                people={percentagePeople}
+                                                setPeople={setPercentagePeople}
+                                                userId={userId}
+                                            />
                                         </TabsContent>
-                                        <TabsContent
-                                            className="text-sm text-muted-foreground text-center"
-                                            value="amount"
-                                        >
-                                            coming soon
+                                        <TabsContent className="mt-4" value="AMOUNT">
+                                            <SplitByAmountSection
+                                                totalAmount={amount}
+                                                people={amountPeople}
+                                                setPeople={setAmountPeople}
+                                                userId={userId}
+                                            />
                                         </TabsContent>
                                     </Tabs>
                                 </PopoverContent>
@@ -195,12 +314,13 @@ export function NewExpenseButton({
                     />
                     <input name="group_id" type="hidden" value={groupId} />
                     <input name="split_config" type="hidden" value={JSON.stringify(splitConfig)} />
+                    <input name="split_type" type="hidden" value={splitType} />
                     {isUpdateOperation ? (
                         <>
                             <input name="id" type="hidden" value={expense?.id} />
                         </>
                     ) : null}
-                    <ClientFormButton className="mt-6" disabled={!hasParticipants}>
+                    <ClientFormButton className="mt-6" disabled={!isValidSplit}>
                         {isUpdateOperation ? "Update Expense" : "Create Expense"}
                     </ClientFormButton>
                 </ClientForm>
