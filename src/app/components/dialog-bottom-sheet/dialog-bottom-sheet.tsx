@@ -23,6 +23,8 @@ export interface DialogBottomSheetProps {
     device?: "mobile" | "desktop"
     setOpen?: (open: boolean) => void
     hideCloseButton?: boolean
+    /** Renders an action element (e.g., Done button) on the right side of the header. When provided, title/description become left-aligned. */
+    headerRightAction?: ReactNode
 }
 
 export const DialogBottomSheetContext = createContext({

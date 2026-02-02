@@ -64,7 +64,7 @@ function getInitialPeople(members: Member[], expense?: ExpenseWithSplits): Peopl
 
 function getInitialPercentagePeople(
     members: Member[],
-    expense?: ExpenseWithSplits
+    expense?: ExpenseWithSplits,
 ): PersonWithPercentage[] {
     if (!expense) {
         return members.map((member) => ({
@@ -76,8 +76,9 @@ function getInitialPercentagePeople(
     // For existing expense, use stored percentage if available, otherwise calculate from amount
     return members.map((member) => {
         const split = expense.splits.find((s) => s.user_id === member.id)
-        const percentage = split?.percentage
-            ?? (split && expense.amount > 0 ? (split.amount / expense.amount) * 100 : 0)
+        const percentage =
+            split?.percentage ??
+            (split && expense.amount > 0 ? (split.amount / expense.amount) * 100 : 0)
         return {
             ...member,
             isChecked: Boolean(split),
@@ -88,7 +89,7 @@ function getInitialPercentagePeople(
 
 function getInitialAmountPeople(
     members: Member[],
-    expense?: ExpenseWithSplits
+    expense?: ExpenseWithSplits,
 ): PersonWithAmount[] {
     if (!expense) {
         return members.map((member) => ({
@@ -133,13 +134,13 @@ export function NewExpenseButton({
 
     // State for each split type
     const [equalPeople, setEqualPeople] = useState<People[]>(() =>
-        getInitialPeople(members, expense)
+        getInitialPeople(members, expense),
     )
     const [percentagePeople, setPercentagePeople] = useState<PersonWithPercentage[]>(() =>
-        getInitialPercentagePeople(members, expense)
+        getInitialPercentagePeople(members, expense),
     )
     const [amountPeople, setAmountPeople] = useState<PersonWithAmount[]>(() =>
-        getInitialAmountPeople(members, expense)
+        getInitialAmountPeople(members, expense),
     )
 
     // Compute the split config based on current split type
@@ -212,7 +213,10 @@ export function NewExpenseButton({
                     <div className="flex items-center gap-x-2">
                         <Label htmlFor="expense-amount">Amount </Label>
                         <div className="flex items-center gap-x-2 text-sm flex-1">
-                            <Select defaultValue={expense?.paid_by ?? userId ?? members[0]?.id} name="paid_by">
+                            <Select
+                                defaultValue={expense?.paid_by ?? userId ?? members[0]?.id}
+                                name="paid_by"
+                            >
                                 <SelectTrigger className="[&_svg]:hidden bg-secondary text-xs px-3 h-8 w-max font-medium shadow-none border-transparent">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -300,6 +304,11 @@ export function NewExpenseButton({
                                     }
                                     title="Split Options"
                                     description="Choose how to split this expense"
+                                    headerRightAction={
+                                        <Button size="sm" onClick={() => setSplitSheetOpen(false)}>
+                                            Done
+                                        </Button>
+                                    }
                                     body={
                                         <>
                                             <Label>Amount</Label>
@@ -322,7 +331,10 @@ export function NewExpenseButton({
                                                     <TabsTrigger className="flex-1" value="EQUAL">
                                                         Equal
                                                     </TabsTrigger>
-                                                    <TabsTrigger className="flex-1" value="PERCENTAGE">
+                                                    <TabsTrigger
+                                                        className="flex-1"
+                                                        value="PERCENTAGE"
+                                                    >
                                                         Percentage
                                                     </TabsTrigger>
                                                     <TabsTrigger className="flex-1" value="AMOUNT">

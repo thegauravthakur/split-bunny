@@ -12,6 +12,7 @@ export function Drawer({
     open,
     setOpen,
     hideCloseButton,
+    headerRightAction,
 }: DialogBottomSheetProps) {
     return (
         <_Drawer.Root open={open} onOpenChange={setOpen}>
@@ -23,17 +24,20 @@ export function Drawer({
                         {/* Fixed header */}
                         <div className="p-4 pb-0 border-t rounded-t-xl">
                             <_Drawer.Handle />
-                            <div className="text-center mt-4 mb-4">
-                                {title ? (
-                                    <_Drawer.Title className="text-lg font-semibold">
-                                        {title}
-                                    </_Drawer.Title>
-                                ) : null}
-                                {description ? (
-                                    <_Drawer.Description className="text-muted-foreground">
-                                        {description}
-                                    </_Drawer.Description>
-                                ) : null}
+                            <div className={`mt-4 mb-4 ${headerRightAction ? "flex items-start justify-between gap-4" : "text-center"}`}>
+                                <div className={headerRightAction ? "text-left" : ""}>
+                                    {title ? (
+                                        <_Drawer.Title className="text-lg font-semibold">
+                                            {title}
+                                        </_Drawer.Title>
+                                    ) : null}
+                                    {description ? (
+                                        <_Drawer.Description className="text-muted-foreground">
+                                            {description}
+                                        </_Drawer.Description>
+                                    ) : null}
+                                </div>
+                                {headerRightAction}
                             </div>
                         </div>
                         {/* Scrollable body */}
