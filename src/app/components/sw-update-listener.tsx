@@ -9,7 +9,9 @@ const SEEN_FIRST_UPDATE_KEY = "sw-seen-first-update"
 
 export function SwUpdateListener() {
     useEffect(() => {
-        if (!("serviceWorker" in navigator)) return
+        if (typeof BroadcastChannel === "undefined") return
+
+        const channel = new BroadcastChannel("sw-updates")
 
         const handleMessage = (event: MessageEvent) => {
             if (event.data?.type === "CACHE_UPDATED") {
@@ -30,8 +32,11 @@ export function SwUpdateListener() {
             }
         }
 
-        navigator.serviceWorker.addEventListener("message", handleMessage)
-        return () => navigator.serviceWorker.removeEventListener("message", handleMessage)
+        channel.addEventListener("message", handleMessage)
+        return () => {
+            channel.removeEventListener("message", handleMessage)
+            channel.close()
+        }
     }, [])
 
     return null

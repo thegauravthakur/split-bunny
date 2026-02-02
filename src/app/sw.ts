@@ -17,20 +17,16 @@ const notifyCacheUpdatePlugin: SerwistPlugin = {
 
             // Only notify if content actually changed
             if (oldText !== newText) {
-                console.log("[SW] Content changed for:", request.url)
-
-                const clients = await self.clients.matchAll({ type: "window" })
-                for (const client of clients) {
-                    client.postMessage({
-                        type: "CACHE_UPDATED",
-                        payload: {
-                            url: request.url,
-                            updatedAt: Date.now(),
-                        },
-                    })
-                }
-            } else {
-                console.log("[SW] Content unchanged for:", request.url)
+                // Use BroadcastChannel for reliable cross-context messaging
+                const channel = new BroadcastChannel("sw-updates")
+                channel.postMessage({
+                    type: "CACHE_UPDATED",
+                    payload: {
+                        url: request.url,
+                        updatedAt: Date.now(),
+                    },
+                })
+                channel.close()
             }
         } catch (err) {
             console.log("[SW] Error comparing responses:", err)
