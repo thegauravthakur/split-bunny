@@ -5,6 +5,7 @@ import { ReactNode, useState } from "react"
 import { CgSpinner } from "react-icons/cg"
 
 import { Button, ButtonProps } from "@/components/ui/button"
+import { clearPagesCache } from "@/lib/sw-cache"
 import { cn } from "@/lib/utils"
 
 interface LogoutButtonProps extends ButtonProps {
@@ -18,6 +19,7 @@ export function LogoutButton({ children, ...props }: LogoutButtonProps) {
     async function handleLogout() {
         try {
             setIsLoading(true)
+            clearPagesCache() // Clear cached pages before logout
             await signOut({ redirectUrl: "/sign-in" })
             setIsLoading(false)
         } catch (_error) {
