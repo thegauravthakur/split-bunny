@@ -1,21 +1,22 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect } from "react"
 import { toast } from "sonner"
 
-// Ignore cache updates within the first few seconds of page load
+// Ignore cache updates within the first few seconds of app startup
 // to avoid showing toast on initial cache population
 const STARTUP_GRACE_PERIOD_MS = 5000
 
-export function SwUpdateListener() {
-    const mountedAtRef = useRef<number>(Date.now())
+// Module-level timestamp set once when JS loads (not on each component mount)
+const appStartTime = typeof window !== "undefined" ? Date.now() : 0
 
+export function SwUpdateListener() {
     useEffect(() => {
         if (!("serviceWorker" in navigator)) return
 
         const handleMessage = (event: MessageEvent) => {
             if (event.data?.type === "CACHE_UPDATED") {
-                const elapsed = Date.now() - mountedAtRef.current
+                const elapsed = Date.now() - appStartTime
                 if (elapsed < STARTUP_GRACE_PERIOD_MS) {
                     return
                 }
