@@ -1,6 +1,29 @@
 import { defaultCache } from "@serwist/next/worker"
-import type { PrecacheEntry, SerwistGlobalConfig } from "serwist"
-import { BroadcastUpdatePlugin, NetworkFirst, Serwist, StaleWhileRevalidate } from "serwist"
+import type { PrecacheEntry, SerwistGlobalConfig, SerwistPlugin } from "serwist"
+import { NetworkFirst, Serwist, StaleWhileRevalidate } from "serwist"
+
+// Custom plugin that notifies clients when cache is updated
+// Unlike BroadcastUpdatePlugin, this doesn't compare headers - it always notifies
+const notifyCacheUpdatePlugin: SerwistPlugin = {
+    cacheDidUpdate: async ({ request, oldResponse, newResponse }) => {
+        // Only notify if there was a previous cached response (not first cache)
+        if (oldResponse && newResponse) {
+            console.log("[SW] Cache updated for:", request.url)
+
+            // Notify all clients
+            const clients = await self.clients.matchAll({ type: "window" })
+            for (const client of clients) {
+                client.postMessage({
+                    type: "CACHE_UPDATED",
+                    payload: {
+                        url: request.url,
+                        updatedAt: Date.now(),
+                    },
+                })
+            }
+        }
+    },
+}
 
 declare global {
     interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -37,12 +60,7 @@ const serwist = new Serwist({
             },
             handler: new StaleWhileRevalidate({
                 cacheName: "pages-cache",
-                plugins: [
-                    new BroadcastUpdatePlugin({
-                        headersToCheck: ["content-length", "etag", "last-modified"],
-                        notifyAllClients: true,
-                    }),
-                ],
+                plugins: [notifyCacheUpdatePlugin],
             }),
         },
         // Other document routes - network first with fallback
