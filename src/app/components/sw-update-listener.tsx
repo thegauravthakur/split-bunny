@@ -3,12 +3,9 @@
 import { useEffect } from "react"
 import { toast } from "sonner"
 
-// Ignore cache updates within the first few seconds of app startup
-// to avoid showing toast on initial cache population
-const STARTUP_GRACE_PERIOD_MS = 5000
-
-// Module-level timestamp set once when JS loads (not on each component mount)
-const appStartTime = typeof window !== "undefined" ? Date.now() : 0
+// Track if we've already seen the first cache update (initial population)
+// Using sessionStorage so it persists across navigations but resets on new tab
+const SEEN_FIRST_UPDATE_KEY = "sw-seen-first-update"
 
 export function SwUpdateListener() {
     useEffect(() => {
@@ -16,8 +13,9 @@ export function SwUpdateListener() {
 
         const handleMessage = (event: MessageEvent) => {
             if (event.data?.type === "CACHE_UPDATED") {
-                const elapsed = Date.now() - appStartTime
-                if (elapsed < STARTUP_GRACE_PERIOD_MS) {
+                // Skip the first update (initial cache population)
+                if (!sessionStorage.getItem(SEEN_FIRST_UPDATE_KEY)) {
+                    sessionStorage.setItem(SEEN_FIRST_UPDATE_KEY, "true")
                     return
                 }
 
