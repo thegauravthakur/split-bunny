@@ -4,6 +4,7 @@ import type { NextConfig } from "next"
 // const withBundleAnalyzer = BundleAnalyzer()
 
 const nextConfig: NextConfig = {
+    cacheComponents: true,
     async redirects() {
         return [
             {

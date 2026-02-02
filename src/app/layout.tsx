@@ -2,7 +2,9 @@ import "./globals.css"
 
 import { ClerkProvider } from "@clerk/nextjs"
 import type { Metadata } from "next"
+import { Suspense } from "react"
 
+import { AppSkeleton } from "@/app/components/app-skeleton"
 import { Header } from "@/app/components/header"
 import { Providers } from "@/app/components/providers/providers"
 import { Toaster } from "@/components/ui/sonner"
@@ -15,11 +17,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps) {
     return (
-        <ClerkProvider>
-            <html lang="en">
-                <head>
-                    <title>Split Bunny</title>
-                    <meta content="#ffffff" name="theme-color" />
+        <html lang="en">
+            <head>
+                <title>Split Bunny</title>
+                <meta content="#ffffff" name="theme-color" />
                     <link
                         href="/splash_screens/iPhone_16_Pro_Max_landscape.png"
                         media="screen and (device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
@@ -234,13 +235,16 @@ export default function RootLayout({ children }: LayoutProps) {
                     <meta content="yes" name="mobile-web-app-capable" />
                 </head>
                 <body className="min-h-dvh flex flex-col">
-                    <Providers>
-                        <Header />
-                        {children}
-                        <Toaster />
-                    </Providers>
+                    <Suspense fallback={<AppSkeleton />}>
+                        <ClerkProvider>
+                            <Providers>
+                                <Header />
+                                {children}
+                                <Toaster />
+                            </Providers>
+                        </ClerkProvider>
+                    </Suspense>
                 </body>
             </html>
-        </ClerkProvider>
     )
 }
