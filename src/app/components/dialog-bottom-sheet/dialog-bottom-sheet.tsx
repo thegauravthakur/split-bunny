@@ -22,6 +22,7 @@ export interface DialogBottomSheetProps {
     open?: boolean
     device?: "mobile" | "desktop"
     setOpen?: (open: boolean) => void
+    hideCloseButton?: boolean
 }
 
 export const DialogBottomSheetContext = createContext({

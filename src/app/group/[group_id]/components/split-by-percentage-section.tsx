@@ -107,11 +107,9 @@ export function SplitByPercentageSection({
                                     <span className="select-none truncate">
                                         {person.id === userId ? "You" : person.name}
                                     </span>
-                                    {person.isChecked && amount > 0 && (
-                                        <span className="text-xs text-muted-foreground">
-                                            ₹{calculatedAmount.toFixed(2)}
-                                        </span>
-                                    )}
+                                    <span className="text-xs text-muted-foreground">
+                                        {person.isChecked ? `₹${calculatedAmount.toFixed(2)}` : "\u00A0"}
+                                    </span>
                                 </div>
                                 <div className="relative">
                                     <Input

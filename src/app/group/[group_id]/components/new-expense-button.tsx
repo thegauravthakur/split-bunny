@@ -127,6 +127,7 @@ export function NewExpenseButton({
         initializeWithValue: false,
     })
     const [isOpen, setIsOpen] = useState(false)
+    const [splitSheetOpen, setSplitSheetOpen] = useState(false)
     const [amount, setAmount] = useState(expense?.amount ?? 0)
     const [splitType, setSplitType] = useState<SplitType>(expense?.type ?? "EQUAL")
 
@@ -224,14 +225,82 @@ export function NewExpenseButton({
                                 </SelectContent>
                             </Select>
                             <p className="min-w-min">paid to be split</p>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button size="sm" variant="secondary">
-                                        {SPLIT_TYPE_LABELS[splitType]}
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-80">
-                                    {isDesktop ? (
+                            {isDesktop ? (
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button size="sm" variant="secondary">
+                                            {SPLIT_TYPE_LABELS[splitType]}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-80">
+                                        <Label>Amount</Label>
+                                        <Input
+                                            required
+                                            selectAllOnFocus
+                                            className="mt-2"
+                                            placeholder="Enter amount"
+                                            startIcon={LiaRupeeSignSolid}
+                                            type="number"
+                                            value={amount || ""}
+                                            onChange={(e) => setAmount(Number(e.target.value))}
+                                        />
+                                        <Tabs
+                                            className="mt-4 w-full"
+                                            value={splitType}
+                                            onValueChange={handleTabChange}
+                                        >
+                                            <TabsList className="w-full">
+                                                <TabsTrigger className="flex-1" value="EQUAL">
+                                                    Equal
+                                                </TabsTrigger>
+                                                <TabsTrigger className="flex-1" value="PERCENTAGE">
+                                                    Percentage
+                                                </TabsTrigger>
+                                                <TabsTrigger className="flex-1" value="AMOUNT">
+                                                    Amount
+                                                </TabsTrigger>
+                                            </TabsList>
+                                            <TabsContent className="mt-4" value="EQUAL">
+                                                <SplitEquallySection
+                                                    amount={amount}
+                                                    people={equalPeople}
+                                                    setPeople={setEqualPeople}
+                                                    userId={userId}
+                                                />
+                                            </TabsContent>
+                                            <TabsContent className="mt-4" value="PERCENTAGE">
+                                                <SplitByPercentageSection
+                                                    amount={amount}
+                                                    people={percentagePeople}
+                                                    setPeople={setPercentagePeople}
+                                                    userId={userId}
+                                                />
+                                            </TabsContent>
+                                            <TabsContent className="mt-4" value="AMOUNT">
+                                                <SplitByAmountSection
+                                                    totalAmount={amount}
+                                                    people={amountPeople}
+                                                    setPeople={setAmountPeople}
+                                                    userId={userId}
+                                                />
+                                            </TabsContent>
+                                        </Tabs>
+                                    </PopoverContent>
+                                </Popover>
+                            ) : (
+                                <DialogBottomSheet
+                                    hideCloseButton
+                                    device="mobile"
+                                    open={splitSheetOpen}
+                                    setOpen={setSplitSheetOpen}
+                                    trigger={
+                                        <Button size="sm" variant="secondary">
+                                            {SPLIT_TYPE_LABELS[splitType]}
+                                        </Button>
+                                    }
+                                    title="Split Options"
+                                    description="Choose how to split this expense"
+                                    body={
                                         <>
                                             <Label>Amount</Label>
                                             <Input
@@ -244,51 +313,51 @@ export function NewExpenseButton({
                                                 value={amount || ""}
                                                 onChange={(e) => setAmount(Number(e.target.value))}
                                             />
+                                            <Tabs
+                                                className="mt-4 w-full"
+                                                value={splitType}
+                                                onValueChange={handleTabChange}
+                                            >
+                                                <TabsList className="w-full">
+                                                    <TabsTrigger className="flex-1" value="EQUAL">
+                                                        Equal
+                                                    </TabsTrigger>
+                                                    <TabsTrigger className="flex-1" value="PERCENTAGE">
+                                                        Percentage
+                                                    </TabsTrigger>
+                                                    <TabsTrigger className="flex-1" value="AMOUNT">
+                                                        Amount
+                                                    </TabsTrigger>
+                                                </TabsList>
+                                                <TabsContent className="mt-4" value="EQUAL">
+                                                    <SplitEquallySection
+                                                        amount={amount}
+                                                        people={equalPeople}
+                                                        setPeople={setEqualPeople}
+                                                        userId={userId}
+                                                    />
+                                                </TabsContent>
+                                                <TabsContent className="mt-4" value="PERCENTAGE">
+                                                    <SplitByPercentageSection
+                                                        amount={amount}
+                                                        people={percentagePeople}
+                                                        setPeople={setPercentagePeople}
+                                                        userId={userId}
+                                                    />
+                                                </TabsContent>
+                                                <TabsContent className="mt-4" value="AMOUNT">
+                                                    <SplitByAmountSection
+                                                        totalAmount={amount}
+                                                        people={amountPeople}
+                                                        setPeople={setAmountPeople}
+                                                        userId={userId}
+                                                    />
+                                                </TabsContent>
+                                            </Tabs>
                                         </>
-                                    ) : null}
-                                    <Tabs
-                                        className="md:mt-4 w-full"
-                                        value={splitType}
-                                        onValueChange={handleTabChange}
-                                    >
-                                        <TabsList className="w-full">
-                                            <TabsTrigger className="flex-1" value="EQUAL">
-                                                Equal
-                                            </TabsTrigger>
-                                            <TabsTrigger className="flex-1" value="PERCENTAGE">
-                                                Percentage
-                                            </TabsTrigger>
-                                            <TabsTrigger className="flex-1" value="AMOUNT">
-                                                Amount
-                                            </TabsTrigger>
-                                        </TabsList>
-                                        <TabsContent className="mt-4" value="EQUAL">
-                                            <SplitEquallySection
-                                                amount={amount}
-                                                people={equalPeople}
-                                                setPeople={setEqualPeople}
-                                                userId={userId}
-                                            />
-                                        </TabsContent>
-                                        <TabsContent className="mt-4" value="PERCENTAGE">
-                                            <SplitByPercentageSection
-                                                amount={amount}
-                                                people={percentagePeople}
-                                                setPeople={setPercentagePeople}
-                                                userId={userId}
-                                            />
-                                        </TabsContent>
-                                        <TabsContent className="mt-4" value="AMOUNT">
-                                            <SplitByAmountSection
-                                                totalAmount={amount}
-                                                people={amountPeople}
-                                                setPeople={setAmountPeople}
-                                                userId={userId}
-                                            />
-                                        </TabsContent>
-                                    </Tabs>
-                                </PopoverContent>
-                            </Popover>
+                                    }
+                                />
+                            )}
                         </div>
                     </div>
                     <Input

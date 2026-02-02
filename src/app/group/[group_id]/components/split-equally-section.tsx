@@ -86,19 +86,20 @@ export function SplitEquallySection({
                     </li>
                 ))}
             </ul>
-            {selectedPeople.length === 0 ? (
-                <p className="text-sm mt-4 text-center text-destructive border-t pt-4">
-                    Select at least one person
-                </p>
-            ) : amount > 0 ? (
-                <p className="text-sm mt-4 flex flex-col items-center border-t pt-4">
-                    <span>₹{displayAmount.toFixed(2)}/person</span>
-                    <span className="text-xs text-muted-foreground">
-                        ({selectedPeople.length} {selectedPeople.length === 1 ? "person" : "people"}
-                        )
-                    </span>
-                </p>
-            ) : null}
+            <div className="mt-4 border-t pt-4">
+                {selectedPeople.length === 0 ? (
+                    <p className="text-sm text-center text-destructive">
+                        Select at least one person
+                    </p>
+                ) : (
+                    <p className="text-sm flex flex-col items-center">
+                        <span>₹{displayAmount.toFixed(2)}/person</span>
+                        <span className="text-xs text-muted-foreground">
+                            ({selectedPeople.length} {selectedPeople.length === 1 ? "person" : "people"})
+                        </span>
+                    </p>
+                )}
+            </div>
         </div>
     )
 }
