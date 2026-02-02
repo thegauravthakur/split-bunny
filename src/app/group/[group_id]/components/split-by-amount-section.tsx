@@ -4,6 +4,7 @@ import { LiaRupeeSignSolid } from "react-icons/lia"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
 
 export interface PersonWithAmount {
     name: string
@@ -82,7 +83,7 @@ export function SplitByAmountSection({
                                 placeholder="0.00"
                                 disabled={!person.isChecked}
                                 startIcon={LiaRupeeSignSolid}
-                                className="h-8 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                className="h-8 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 onChange={(e) =>
                                     handleAmountChange(
                                         person.id,
@@ -90,12 +91,14 @@ export function SplitByAmountSection({
                                     )
                                 }
                             />
-                            <Checkbox
-                                checked={person.isChecked}
-                                onCheckedChange={(checked) =>
-                                    handleCheckedChange(person.id, Boolean(checked))
-                                }
-                            />
+                            <label className="flex items-center justify-center min-w-[44px] min-h-[44px] cursor-pointer -m-3">
+                                <Checkbox
+                                    checked={person.isChecked}
+                                    onCheckedChange={(checked) =>
+                                        handleCheckedChange(person.id, Boolean(checked))
+                                    }
+                                />
+                            </label>
                         </div>
                     </li>
                 ))}
@@ -105,21 +108,18 @@ export function SplitByAmountSection({
                     <p className="text-sm text-center text-destructive">
                         Select at least one person
                     </p>
-                ) : !isValid ? (
-                    <div className="text-sm text-center">
-                        <p className="text-destructive">
-                            {remainingAmount > 0
-                                ? `₹${remainingAmount.toFixed(2)} remaining to allocate`
-                                : `₹${Math.abs(remainingAmount).toFixed(2)} over-allocated`}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                            Allocated: ₹{allocatedAmount.toFixed(2)} / ₹{totalAmount.toFixed(2)}
-                        </p>
-                    </div>
                 ) : (
-                    <p className="text-sm text-center text-muted-foreground">
-                        ₹{allocatedAmount.toFixed(2)} allocated
-                    </p>
+                    <div className="text-sm text-center flex flex-col items-center">
+                        <span className={cn(!isValid ? "text-destructive" : "text-muted-foreground")}>
+                            ₹{allocatedAmount.toFixed(2)} of ₹{totalAmount.toFixed(2)}
+                        </span>
+                        <span className={cn(
+                            "text-xs",
+                            Math.abs(remainingAmount) > 0.01 ? "text-destructive" : "text-muted-foreground"
+                        )}>
+                            ₹{remainingAmount.toFixed(2)} left
+                        </span>
+                    </div>
                 )}
             </div>
         </div>

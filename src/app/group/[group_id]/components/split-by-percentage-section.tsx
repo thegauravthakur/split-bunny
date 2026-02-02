@@ -4,6 +4,7 @@ import { LuPercent } from "react-icons/lu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
 
 export interface PersonWithPercentage {
     name: string
@@ -68,7 +69,8 @@ export function SplitByPercentageSection({
 }: SplitByPercentageSectionProps) {
     const selectedPeople = people.filter((p) => p.isChecked)
     const totalPercentage = selectedPeople.reduce((sum, p) => sum + p.percentage, 0)
-    const isValid = Math.abs(totalPercentage - 100) <= 0.01
+    const percentageLeft = 100 - totalPercentage
+    const isValid = Math.abs(percentageLeft) <= 0.01
     const splitConfig = createPercentageSplitConfig(people, amount)
 
     function handlePercentageChange(personId: string, value: number) {
@@ -120,7 +122,7 @@ export function SplitByPercentageSection({
                                         value={person.percentage || ""}
                                         placeholder="0"
                                         disabled={!person.isChecked}
-                                        className="h-8 text-sm pr-7 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                        className="h-8 pr-7 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                         onChange={(e) =>
                                             handlePercentageChange(
                                                 person.id,
@@ -130,12 +132,14 @@ export function SplitByPercentageSection({
                                     />
                                     <LuPercent className="absolute right-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
                                 </div>
-                                <Checkbox
-                                    checked={person.isChecked}
-                                    onCheckedChange={(checked) =>
-                                        handleCheckedChange(person.id, Boolean(checked))
-                                    }
-                                />
+                                <label className="flex items-center justify-center min-w-[44px] min-h-[44px] cursor-pointer -m-3">
+                                    <Checkbox
+                                        checked={person.isChecked}
+                                        onCheckedChange={(checked) =>
+                                            handleCheckedChange(person.id, Boolean(checked))
+                                        }
+                                    />
+                                </label>
                             </div>
                         </li>
                     )
@@ -146,14 +150,18 @@ export function SplitByPercentageSection({
                     <p className="text-sm text-center text-destructive">
                         Select at least one person
                     </p>
-                ) : !isValid ? (
-                    <p className="text-sm text-center text-destructive">
-                        Percentages must add up to 100% (currently {totalPercentage.toFixed(2)}%)
-                    </p>
                 ) : (
-                    <p className="text-sm text-center text-muted-foreground">
-                        Total: {totalPercentage.toFixed(2)}%
-                    </p>
+                    <div className="text-sm text-center flex flex-col items-center">
+                        <span className={cn(!isValid ? "text-destructive" : "text-muted-foreground")}>
+                            {totalPercentage.toFixed(2)}% of 100%
+                        </span>
+                        <span className={cn(
+                            "text-xs",
+                            Math.abs(percentageLeft) > 0.01 ? "text-destructive" : "text-muted-foreground"
+                        )}>
+                            {percentageLeft.toFixed(2)}% left
+                        </span>
+                    </div>
                 )}
             </div>
         </div>

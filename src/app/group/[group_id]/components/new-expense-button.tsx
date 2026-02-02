@@ -67,11 +67,10 @@ function getInitialPercentagePeople(
     expense?: ExpenseWithSplits
 ): PersonWithPercentage[] {
     if (!expense) {
-        const equalPercentage = members.length > 0 ? 100 / members.length : 0
         return members.map((member) => ({
             ...member,
             isChecked: true,
-            percentage: Number(equalPercentage.toFixed(2)),
+            percentage: 0,
         }))
     }
     // For existing expense, use stored percentage if available, otherwise calculate from amount
@@ -167,7 +166,7 @@ export function NewExpenseButton({
             case "AMOUNT": {
                 const selected = amountPeople.filter((p) => p.isChecked)
                 const allocated = selected.reduce((sum, p) => sum + p.customAmount, 0)
-                return selected.length > 0 && Math.abs(allocated - amount) <= 0.01
+                return amount > 0 && selected.length > 0 && Math.abs(allocated - amount) <= 0.01
             }
         }
     })()
