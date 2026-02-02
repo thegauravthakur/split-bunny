@@ -3,6 +3,7 @@ import { format } from "date-fns"
 import Link from "next/link"
 
 import { CreateNewGroupCard } from "@/app/components/create-new-group-card"
+import { HomeCacheRefresher } from "@/app/components/home-cache-refresher"
 import { PlainCard } from "@/app/components/plain-cart"
 import prisma from "@/lib/prisma"
 import { cn } from "@/lib/utils"
@@ -16,6 +17,7 @@ export default async function Home() {
 
     return (
         <div className="max-w-(--breakpoint-lg) md:mx-auto px-4">
+            <HomeCacheRefresher />
             <h3 className="text-lg font-bold mt-4 md:mt-10 mb-4 capitalize">groups</h3>
             <main className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full")}>
                 <CreateNewGroupCard />

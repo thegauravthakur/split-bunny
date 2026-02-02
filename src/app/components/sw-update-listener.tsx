@@ -5,11 +5,9 @@ import { toast } from "sonner"
 
 export function SwUpdateListener() {
     useEffect(() => {
-        if (typeof BroadcastChannel === "undefined") return
+        if (!("serviceWorker" in navigator)) return
 
-        const channel = new BroadcastChannel("serwist")
-
-        channel.addEventListener("message", (event) => {
+        const handleMessage = (event: MessageEvent) => {
             if (event.data?.type === "CACHE_UPDATED") {
                 toast("New content available", {
                     description: "Tap to refresh and see the latest updates",
@@ -20,9 +18,13 @@ export function SwUpdateListener() {
                     duration: 10000,
                 })
             }
-        })
+        }
 
-        return () => channel.close()
+        navigator.serviceWorker.addEventListener("message", handleMessage)
+
+        return () => {
+            navigator.serviceWorker.removeEventListener("message", handleMessage)
+        }
     }, [])
 
     return null
