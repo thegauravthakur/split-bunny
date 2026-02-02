@@ -2,25 +2,38 @@ import { defaultCache } from "@serwist/next/worker"
 import type { PrecacheEntry, SerwistGlobalConfig, SerwistPlugin } from "serwist"
 import { NetworkFirst, Serwist, StaleWhileRevalidate } from "serwist"
 
-// Custom plugin that notifies clients when cache is updated
-// Unlike BroadcastUpdatePlugin, this doesn't compare headers - it always notifies
+// Custom plugin that notifies clients only when content actually changes
 const notifyCacheUpdatePlugin: SerwistPlugin = {
     cacheDidUpdate: async ({ request, oldResponse, newResponse }) => {
-        // Only notify if there was a previous cached response (not first cache)
-        if (oldResponse && newResponse) {
-            console.log("[SW] Cache updated for:", request.url)
+        // Only compare if there was a previous cached response
+        if (!oldResponse || !newResponse) return
 
-            // Notify all clients
-            const clients = await self.clients.matchAll({ type: "window" })
-            for (const client of clients) {
-                client.postMessage({
-                    type: "CACHE_UPDATED",
-                    payload: {
-                        url: request.url,
-                        updatedAt: Date.now(),
-                    },
-                })
+        try {
+            // Compare actual content (clone responses since body can only be read once)
+            const [oldText, newText] = await Promise.all([
+                oldResponse.clone().text(),
+                newResponse.clone().text(),
+            ])
+
+            // Only notify if content actually changed
+            if (oldText !== newText) {
+                console.log("[SW] Content changed for:", request.url)
+
+                const clients = await self.clients.matchAll({ type: "window" })
+                for (const client of clients) {
+                    client.postMessage({
+                        type: "CACHE_UPDATED",
+                        payload: {
+                            url: request.url,
+                            updatedAt: Date.now(),
+                        },
+                    })
+                }
+            } else {
+                console.log("[SW] Content unchanged for:", request.url)
             }
+        } catch (err) {
+            console.log("[SW] Error comparing responses:", err)
         }
     },
 }
