@@ -11,16 +11,21 @@ export function clearPagesCache() {
  */
 export function refreshPageCache(url: string = "/") {
     if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
-        // Fetch with cache: "reload" to bypass browser cache and hit the network
-        // The SW will intercept this and update its cache via stale-while-revalidate
+        console.log("[refreshPageCache] Fetching:", url)
+        // Fetch with proper headers so SW recognizes it as an HTML page request
         fetch(url, {
-            cache: "reload",
+            cache: "no-cache", // Bypass browser cache, hit network
             headers: {
-                // Signal this is a cache refresh, not a user navigation
-                "X-Cache-Refresh": "true",
+                Accept: "text/html", // Signal we want HTML
             },
-        }).catch(() => {
-            // Silently ignore errors - this is a background optimization
         })
+            .then((res) => {
+                console.log("[refreshPageCache] Response:", res.status, res.ok)
+            })
+            .catch((err) => {
+                console.log("[refreshPageCache] Error:", err)
+            })
+    } else {
+        console.log("[refreshPageCache] No SW controller available")
     }
 }

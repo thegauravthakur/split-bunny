@@ -17,14 +17,30 @@ const serwist = new Serwist({
     navigationPreload: true,
     runtimeCaching: [
         // Home page - stale-while-revalidate for instant load
+        // Match any request to "/" (navigation or fetch)
         {
-            matcher: ({ request, url }) =>
-                request.destination === "document" && url.pathname === "/",
+            matcher: ({ request, url }) => {
+                const isHomePage = url.pathname === "/"
+                // Accept document requests OR requests that want HTML
+                const wantsHtml =
+                    request.destination === "document" ||
+                    request.headers.get("Accept")?.includes("text/html")
+                const shouldHandle = isHomePage && wantsHtml
+                if (isHomePage) {
+                    console.log("[SW] Home page request:", {
+                        destination: request.destination,
+                        accept: request.headers.get("Accept"),
+                        shouldHandle,
+                    })
+                }
+                return shouldHandle
+            },
             handler: new StaleWhileRevalidate({
                 cacheName: "pages-cache",
                 plugins: [
                     new BroadcastUpdatePlugin({
                         headersToCheck: ["content-length", "etag", "last-modified"],
+                        notifyAllClients: true,
                     }),
                 ],
             }),
