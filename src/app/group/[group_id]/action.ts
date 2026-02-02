@@ -4,10 +4,15 @@ import { auth } from "@clerk/nextjs/server"
 import type { Expense, Group } from "@prisma/client"
 import { err, ok, Result } from "neverthrow"
 import { revalidatePath } from "next/cache"
+import { redirect } from "next/navigation"
 import { z } from "zod"
 
+import { ExpenseWithSplits } from "@/app/group/[group_id]/(tabs)/expenses/page"
+import { calculateUserBalance } from "@/app/group/[group_id]/(tabs)/expenses/utls"
 import { createParsableResultInterface } from "@/app/utils/result"
 import prisma from "@/lib/prisma"
+
+const BALANCE_TOLERANCE = 0.01
 
 function getGroupDetails(groupId: string, userId: string): Promise<Group | null> {
     return prisma.group.findUnique({
@@ -198,4 +203,64 @@ export async function deleteExpenseAction(
     } catch (_error) {
         return createParsableResultInterface(err(["Failed to delete expense."]))
     }
+}
+
+/**
+ * Checks if all expenses in a group are settled (all member balances are zero)
+ */
+function areAllExpensesSettled(memberIds: string[], expenses: ExpenseWithSplits[]): boolean {
+    // No expenses means all settled
+    if (expenses.length === 0) return true
+
+    // Check if all member balances are within tolerance of zero
+    for (const memberId of memberIds) {
+        const balance = calculateUserBalance(memberId, expenses)
+        if (Math.abs(balance) > BALANCE_TOLERANCE) {
+            return false
+        }
+    }
+    return true
+}
+
+/**
+ * Deletes a group and all associated data (expenses, splits, invitations).
+ * Only allowed if all expenses are settled.
+ */
+export async function deleteGroupAction(
+    groupId: string,
+): Promise<ReturnType<typeof createParsableResultInterface>> {
+    try {
+        const _auth = await auth()
+        const userId = _auth.userId ?? undefined
+        if (!userId) return createParsableResultInterface(err(["You must be logged in."]))
+
+        // Verify user is member of the group
+        const group = await prisma.group.findUnique({
+            where: { id: groupId, member_ids: { has: userId } },
+        })
+        if (!group) return createParsableResultInterface(err(["Group not found."]))
+
+        // Get all expenses with splits to check if settled
+        const expenses = await prisma.expense.findMany({
+            where: { group_id: groupId },
+            include: { splits: true },
+        })
+
+        // Check if all expenses are settled
+        if (!areAllExpensesSettled(group.member_ids, expenses)) {
+            return createParsableResultInterface(
+                err(["Cannot delete group. All expenses must be settled first."]),
+            )
+        }
+
+        // Delete the group (cascade will delete expenses, splits, and invitations)
+        await prisma.group.delete({ where: { id: groupId } })
+
+        revalidatePath("/")
+    } catch (_error) {
+        return createParsableResultInterface(err(["Failed to delete group."]))
+    }
+
+    // Redirect to home after successful deletion
+    redirect("/")
 }
