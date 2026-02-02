@@ -1,6 +1,6 @@
 import { defaultCache } from "@serwist/next/worker"
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist"
-import { NetworkFirst, Serwist, StaleWhileRevalidate } from "serwist"
+import { BroadcastUpdatePlugin, NetworkFirst, Serwist, StaleWhileRevalidate } from "serwist"
 
 declare global {
     interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -22,6 +22,11 @@ const serwist = new Serwist({
                 request.destination === "document" && url.pathname === "/",
             handler: new StaleWhileRevalidate({
                 cacheName: "pages-cache",
+                plugins: [
+                    new BroadcastUpdatePlugin({
+                        headersToCheck: ["content-length", "etag", "last-modified"],
+                    }),
+                ],
             }),
         },
         // Other document routes - network first with fallback

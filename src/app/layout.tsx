@@ -7,6 +7,7 @@ import { Suspense } from "react"
 import { AppSkeleton } from "@/app/components/app-skeleton"
 import { Header } from "@/app/components/header"
 import { Providers } from "@/app/components/providers/providers"
+import { SwUpdateListener } from "@/app/components/sw-update-listener"
 import { Toaster } from "@/components/ui/sonner"
 import { LayoutProps } from "@/types/common"
 
@@ -241,6 +242,7 @@ export default function RootLayout({ children }: LayoutProps) {
                                 <Header />
                                 {children}
                                 <Toaster />
+                                <SwUpdateListener />
                             </Providers>
                         </ClerkProvider>
                     </Suspense>
