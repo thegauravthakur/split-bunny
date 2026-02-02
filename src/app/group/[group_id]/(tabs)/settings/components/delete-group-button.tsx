@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { CgSpinner } from "react-icons/cg"
 import { toast } from "sonner"
@@ -24,6 +25,7 @@ interface DeleteGroupButtonProps {
 }
 
 export function DeleteGroupButton({ groupId, groupName, isSettled }: DeleteGroupButtonProps) {
+    const router = useRouter()
     const [isDeleting, setIsDeleting] = useState(false)
     const [open, setOpen] = useState(false)
 
@@ -41,7 +43,7 @@ export function DeleteGroupButton({ groupId, groupName, isSettled }: DeleteGroup
             }
 
             toast.success("Group deleted successfully")
-            // Redirect happens in the server action
+            router.push("/")
         } catch {
             toast.error("Failed to delete group")
             setIsDeleting(false)

@@ -4,7 +4,6 @@ import { auth } from "@clerk/nextjs/server"
 import type { Expense, Group } from "@prisma/client"
 import { err, ok, Result } from "neverthrow"
 import { revalidatePath } from "next/cache"
-import { redirect } from "next/navigation"
 import { z } from "zod"
 
 import { ExpenseWithSplits } from "@/app/group/[group_id]/(tabs)/expenses/page"
@@ -257,10 +256,8 @@ export async function deleteGroupAction(
         await prisma.group.delete({ where: { id: groupId } })
 
         revalidatePath("/")
+        return createParsableResultInterface(ok(["Group deleted successfully"]))
     } catch (_error) {
         return createParsableResultInterface(err(["Failed to delete group."]))
     }
-
-    // Redirect to home after successful deletion
-    redirect("/")
 }
