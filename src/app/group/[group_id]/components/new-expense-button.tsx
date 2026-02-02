@@ -241,7 +241,7 @@ export function NewExpenseButton({
                                                 placeholder="Enter amount"
                                                 startIcon={LiaRupeeSignSolid}
                                                 type="number"
-                                                value={amount}
+                                                value={amount || ""}
                                                 onChange={(e) => setAmount(Number(e.target.value))}
                                             />
                                         </>
@@ -299,7 +299,7 @@ export function NewExpenseButton({
                         placeholder="100"
                         startIcon={LiaRupeeSignSolid}
                         type="number"
-                        value={amount}
+                        value={amount || ""}
                         onChange={(e) => setAmount(Number(e.target.value))}
                     />
                     <Label htmlFor="expense-description">Description</Label>
