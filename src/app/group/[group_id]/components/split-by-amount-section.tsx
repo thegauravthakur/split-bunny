@@ -47,9 +47,7 @@ export function SplitByAmountSection({
     const isValid = Math.abs(remainingAmount) <= 0.01
 
     function handleAmountChange(personId: string, value: number) {
-        const newPeople = people.map((p) =>
-            p.id === personId ? { ...p, customAmount: value } : p
-        )
+        const newPeople = people.map((p) => (p.id === personId ? { ...p, customAmount: value } : p))
         setPeople(newPeople)
     }
 
@@ -57,7 +55,7 @@ export function SplitByAmountSection({
         const newPeople = people.map((p) =>
             p.id === personId
                 ? { ...p, isChecked: checked, customAmount: checked ? p.customAmount : 0 }
-                : p
+                : p,
         )
         setPeople(newPeople)
     }
@@ -66,7 +64,7 @@ export function SplitByAmountSection({
         <div>
             <ul className="flex flex-col gap-4">
                 {people.map((person) => (
-                    <li key={person.id}>
+                    <li key={person.id} className="h-9">
                         <div className="text-sm grid grid-cols-[32px_1fr_100px_max-content] items-center gap-3">
                             <Avatar className="h-8 w-8">
                                 <AvatarImage src={person.image} />
@@ -85,10 +83,7 @@ export function SplitByAmountSection({
                                 startIcon={LiaRupeeSignSolid}
                                 className="h-8 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 onChange={(e) =>
-                                    handleAmountChange(
-                                        person.id,
-                                        Number(e.target.value) || 0
-                                    )
+                                    handleAmountChange(person.id, Number(e.target.value) || 0)
                                 }
                             />
                             <label className="flex items-center justify-center min-w-[44px] min-h-[44px] cursor-pointer -m-3">
@@ -110,13 +105,19 @@ export function SplitByAmountSection({
                     </p>
                 ) : (
                     <div className="text-sm text-center flex flex-col items-center">
-                        <span className={cn(!isValid ? "text-destructive" : "text-muted-foreground")}>
+                        <span
+                            className={cn(!isValid ? "text-destructive" : "text-muted-foreground")}
+                        >
                             ₹{allocatedAmount.toFixed(2)} of ₹{totalAmount.toFixed(2)}
                         </span>
-                        <span className={cn(
-                            "text-xs",
-                            Math.abs(remainingAmount) > 0.01 ? "text-destructive" : "text-muted-foreground"
-                        )}>
+                        <span
+                            className={cn(
+                                "text-xs",
+                                Math.abs(remainingAmount) > 0.01
+                                    ? "text-destructive"
+                                    : "text-muted-foreground",
+                            )}
+                        >
                             ₹{remainingAmount.toFixed(2)} left
                         </span>
                     </div>

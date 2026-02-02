@@ -34,7 +34,6 @@ export async function ExpenseCard({ expense, members }: ExpenseCardProps) {
     const isPaidByMe = userId === expense.paid_by
     const paidBy = members.find((member) => member.id === expense.paid_by)?.name
 
-    // Calculate user's balance for this expense
     const userBalance = getUserExpenseBalance(expense, userId as string)
     const isOwed = userBalance > 0
     const owes = userBalance < 0
@@ -51,7 +50,7 @@ export async function ExpenseCard({ expense, members }: ExpenseCardProps) {
                     {format(expense.created_at, "dd")}
                 </span>
             </div>
-            <CiReceipt fontSize={42} />
+            {device === "desktop" && <CiReceipt fontSize={42} />}
             <div className="flex-1 min-w-0">
                 <h5 className="font-semibold truncate">{expense.name}</h5>
                 <p className="text-sm text-muted-foreground">

@@ -21,7 +21,7 @@ export function Drawer({
                 <_Drawer.Content className="bg-white z-20 flex flex-col fixed bottom-0 left-0 right-0 max-h-[85vh] rounded-t-[10px]">
                     <div className="max-w-md w-full mx-auto flex flex-col max-h-full">
                         {/* Fixed header */}
-                        <div className="p-4 pb-0">
+                        <div className="p-4 pb-0 border-t rounded-t-xl">
                             <_Drawer.Handle />
                             <div className="text-center mt-4 mb-4">
                                 {title ? (
@@ -37,7 +37,9 @@ export function Drawer({
                             </div>
                         </div>
                         {/* Scrollable body */}
-                        <div className={`flex-1 overflow-auto px-4 ${hideCloseButton ? "pb-4" : ""}`}>
+                        <div
+                            className={`flex-1 overflow-auto px-4 ${hideCloseButton ? "pb-4" : ""}`}
+                        >
                             {body}
                         </div>
                         {/* Fixed footer */}

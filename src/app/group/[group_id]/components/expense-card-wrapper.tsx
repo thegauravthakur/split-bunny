@@ -62,10 +62,10 @@ export function ExpenseCardWrapper({
                 <DrawerTrigger asChild>{cardContent}</DrawerTrigger>
                 <DrawerContent>
                     <DrawerHeader>
-                        <DrawerTitle>{expense.name}</DrawerTitle>
-                        <DrawerDescription>
-                            {format(expense.created_at, "MMMM d, yyyy")}
-                        </DrawerDescription>
+                        {/*<DrawerTitle>{expense.name}</DrawerTitle>*/}
+                        {/*<DrawerDescription>*/}
+                        {/*    {format(expense.created_at, "MMMM d, yyyy")}*/}
+                        {/*</DrawerDescription>*/}
                     </DrawerHeader>
                     {detailContent}
                 </DrawerContent>

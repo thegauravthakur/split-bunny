@@ -58,7 +58,7 @@ export function SplitEquallySection({
         <div>
             <ul className="flex flex-col gap-4">
                 {people.map((person) => (
-                    <li key={person.id}>
+                    <li key={person.id} className="h-9">
                         <label className="text-sm grid grid-cols-[32px_1fr_max-content] items-center gap-4 cursor-pointer">
                             <Avatar className="h-8 w-8">
                                 <AvatarImage src={person.image} />
@@ -95,7 +95,8 @@ export function SplitEquallySection({
                     <p className="text-sm flex flex-col items-center">
                         <span>₹{displayAmount.toFixed(2)}/person</span>
                         <span className="text-xs text-muted-foreground">
-                            ({selectedPeople.length} {selectedPeople.length === 1 ? "person" : "people"})
+                            ({selectedPeople.length}{" "}
+                            {selectedPeople.length === 1 ? "person" : "people"})
                         </span>
                     </p>
                 )}

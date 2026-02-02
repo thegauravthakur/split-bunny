@@ -26,10 +26,7 @@ interface SplitByPercentageSectionProps {
  * Converts percentages to actual amounts using paise-based math for precision.
  * Distributes any rounding remainder to maintain exact total.
  */
-export function createPercentageSplitConfig(
-    people: PersonWithPercentage[],
-    totalAmount: number
-) {
+export function createPercentageSplitConfig(people: PersonWithPercentage[], totalAmount: number) {
     const participants = people.filter((p) => p.isChecked && p.percentage > 0)
     if (participants.length === 0 || totalAmount === 0) return []
 
@@ -74,9 +71,7 @@ export function SplitByPercentageSection({
     const splitConfig = createPercentageSplitConfig(people, amount)
 
     function handlePercentageChange(personId: string, value: number) {
-        const newPeople = people.map((p) =>
-            p.id === personId ? { ...p, percentage: value } : p
-        )
+        const newPeople = people.map((p) => (p.id === personId ? { ...p, percentage: value } : p))
         setPeople(newPeople)
     }
 
@@ -84,7 +79,7 @@ export function SplitByPercentageSection({
         const newPeople = people.map((p) =>
             p.id === personId
                 ? { ...p, isChecked: checked, percentage: checked ? p.percentage : 0 }
-                : p
+                : p,
         )
         setPeople(newPeople)
     }
@@ -97,7 +92,7 @@ export function SplitByPercentageSection({
                     const calculatedAmount = personSplit?.amount ?? 0
 
                     return (
-                        <li key={person.id}>
+                        <li key={person.id} className="h-9">
                             <div className="text-sm grid grid-cols-[32px_1fr_80px_max-content] items-center gap-3">
                                 <Avatar className="h-8 w-8">
                                     <AvatarImage src={person.image} />
@@ -108,7 +103,9 @@ export function SplitByPercentageSection({
                                         {person.id === userId ? "You" : person.name}
                                     </span>
                                     <span className="text-xs text-muted-foreground">
-                                        {person.isChecked ? `₹${calculatedAmount.toFixed(2)}` : "\u00A0"}
+                                        {person.isChecked
+                                            ? `₹${calculatedAmount.toFixed(2)}`
+                                            : "\u00A0"}
                                     </span>
                                 </div>
                                 <div className="relative">
@@ -124,7 +121,7 @@ export function SplitByPercentageSection({
                                         onChange={(e) =>
                                             handlePercentageChange(
                                                 person.id,
-                                                Number(e.target.value) || 0
+                                                Number(e.target.value) || 0,
                                             )
                                         }
                                     />
@@ -150,13 +147,19 @@ export function SplitByPercentageSection({
                     </p>
                 ) : (
                     <div className="text-sm text-center flex flex-col items-center">
-                        <span className={cn(!isValid ? "text-destructive" : "text-muted-foreground")}>
+                        <span
+                            className={cn(!isValid ? "text-destructive" : "text-muted-foreground")}
+                        >
                             {totalPercentage.toFixed(2)}% of 100%
                         </span>
-                        <span className={cn(
-                            "text-xs",
-                            Math.abs(percentageLeft) > 0.01 ? "text-destructive" : "text-muted-foreground"
-                        )}>
+                        <span
+                            className={cn(
+                                "text-xs",
+                                Math.abs(percentageLeft) > 0.01
+                                    ? "text-destructive"
+                                    : "text-muted-foreground",
+                            )}
+                        >
                             {percentageLeft.toFixed(2)}% left
                         </span>
                     </div>
