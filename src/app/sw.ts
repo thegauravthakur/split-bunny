@@ -2,32 +2,96 @@ import { defaultCache } from "@serwist/next/worker"
 import type { PrecacheEntry, SerwistGlobalConfig, SerwistPlugin } from "serwist"
 import { NetworkFirst, Serwist, StaleWhileRevalidate } from "serwist"
 
-// Custom plugin that notifies clients only when content actually changes
+const CONTENT_HASH_HEADER = "x-sw-content-hash"
+
+const toHex = (buffer: ArrayBuffer) =>
+    Array.from(new Uint8Array(buffer))
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("")
+
+const hashBody = async (buffer: ArrayBuffer) => {
+    const digest = await crypto.subtle.digest("SHA-256", buffer)
+    return toHex(digest)
+}
+
+const getContentHash = async (response: Response) => {
+    const existing = response.headers.get(CONTENT_HASH_HEADER)
+    if (existing) return existing
+
+    try {
+        const body = await response.clone().arrayBuffer()
+        return await hashBody(body)
+    } catch (err) {
+        console.log("[SW] Error hashing cached response:", err)
+        return null
+    }
+}
+
+const broadcastCacheUpdate = async (payload: {
+    updatedURL: string
+    contentHash: string
+    updatedAt: number
+}) => {
+    const clients = await self.clients.matchAll({
+        type: "window",
+        includeUncontrolled: true,
+    })
+    for (const client of clients) {
+        client.postMessage({
+            type: "CACHE_UPDATED",
+            meta: "serwist-broadcast-update",
+            payload,
+        })
+    }
+}
+
+// Custom plugin that adds a stable content hash and notifies clients on change
 const notifyCacheUpdatePlugin: SerwistPlugin = {
+    cacheWillUpdate: async ({ request, response }) => {
+        if (!response || response.status !== 200) return null
+
+        const wantsHtml =
+            request.destination === "document" ||
+            request.headers.get("Accept")?.includes("text/html")
+
+        if (!wantsHtml) return response
+
+        try {
+            const body = await response.clone().arrayBuffer()
+            const contentHash = await hashBody(body)
+
+            const headers = new Headers(response.headers)
+            headers.set(CONTENT_HASH_HEADER, contentHash)
+            // Body is decoded bytes; ensure we don't lie about encoding/length.
+            headers.delete("content-encoding")
+            headers.delete("content-length")
+
+            return new Response(body, {
+                status: response.status,
+                statusText: response.statusText,
+                headers,
+            })
+        } catch (err) {
+            console.log("[SW] Error hashing HTML response:", err)
+            return response
+        }
+    },
     cacheDidUpdate: async ({ request, oldResponse, newResponse }) => {
-        // Only compare if there was a previous cached response
         if (!oldResponse || !newResponse) return
 
         try {
-            // Compare actual content (clone responses since body can only be read once)
-            const [oldText, newText] = await Promise.all([
-                oldResponse.clone().text(),
-                newResponse.clone().text(),
+            const [oldHash, newHash] = await Promise.all([
+                getContentHash(oldResponse),
+                getContentHash(newResponse),
             ])
 
-            // Only notify if content actually changed
-            if (oldText !== newText) {
-                // Use BroadcastChannel for reliable cross-context messaging
-                const channel = new BroadcastChannel("sw-updates")
-                channel.postMessage({
-                    type: "CACHE_UPDATED",
-                    payload: {
-                        url: request.url,
-                        updatedAt: Date.now(),
-                    },
-                })
-                channel.close()
-            }
+            if (!oldHash || !newHash || oldHash === newHash) return
+
+            await broadcastCacheUpdate({
+                updatedURL: request.url,
+                contentHash: newHash,
+                updatedAt: Date.now(),
+            })
         } catch (err) {
             console.log("[SW] Error comparing responses:", err)
         }

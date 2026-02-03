@@ -3,39 +3,53 @@
 import { useEffect } from "react"
 import { toast } from "sonner"
 
-// Track if we've already seen the first cache update (initial population)
-// Using sessionStorage so it persists across navigations but resets on new tab
-const SEEN_FIRST_UPDATE_KEY = "sw-seen-first-update"
+const LAST_SEEN_HASH_KEY = "sw-last-content-hash"
 
 export function SwUpdateListener() {
     useEffect(() => {
-        if (typeof BroadcastChannel === "undefined") return
-
-        const channel = new BroadcastChannel("sw-updates")
+        if (!("serviceWorker" in navigator)) return
 
         const handleMessage = (event: MessageEvent) => {
-            if (event.data?.type === "CACHE_UPDATED") {
-                // Skip the first update (initial cache population)
-                if (!sessionStorage.getItem(SEEN_FIRST_UPDATE_KEY)) {
-                    sessionStorage.setItem(SEEN_FIRST_UPDATE_KEY, "true")
-                    return
-                }
+            const data = event.data
+            if (!data || data.type !== "CACHE_UPDATED") return
+            if (data.meta && data.meta !== "serwist-broadcast-update") return
 
-                toast("New content available", {
-                    description: "Tap to refresh and see the latest updates",
-                    action: {
-                        label: "Refresh",
-                        onClick: () => window.location.reload(),
-                    },
-                    duration: 10000,
-                })
+            const payload = data.payload ?? {}
+            const updatedURL: string | undefined =
+                payload.updatedURL || payload.url
+
+            if (!updatedURL) return
+
+            const pathname = new URL(
+                updatedURL,
+                window.location.origin
+            ).pathname
+
+            if (pathname !== "/") return
+
+            const contentHash: string | undefined = payload.contentHash
+            if (contentHash) {
+                const lastSeen = sessionStorage.getItem(LAST_SEEN_HASH_KEY)
+                if (lastSeen === contentHash) return
+                sessionStorage.setItem(LAST_SEEN_HASH_KEY, contentHash)
             }
+
+            toast("New content available", {
+                description: "Tap to refresh and see the latest updates",
+                action: {
+                    label: "Refresh",
+                    onClick: () => window.location.reload(),
+                },
+                duration: 10000,
+            })
         }
 
-        channel.addEventListener("message", handleMessage)
+        navigator.serviceWorker.addEventListener("message", handleMessage)
         return () => {
-            channel.removeEventListener("message", handleMessage)
-            channel.close()
+            navigator.serviceWorker?.removeEventListener(
+                "message",
+                handleMessage
+            )
         }
     }, [])
 
